@@ -1,4 +1,4 @@
-import totalUp
+from src import totalUp
 
 
 class Player:
