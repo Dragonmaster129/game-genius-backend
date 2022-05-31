@@ -1,3 +1,6 @@
+import totalUp
+
+
 class Player:
     def __init__(self, data):
         self.data = data
@@ -87,3 +90,7 @@ externalData = {
         "insurance": 0,
     },
 }
+
+print("Total Income:", totalUp.totalUp(externalData["assets"]))
+print()
+print("Total Expenses:", totalUp.totalUp(externalData["expenses"]))
