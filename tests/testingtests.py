@@ -1,5 +1,5 @@
 import unittest
-
+import buy_test
 
 class TestStringMethods(unittest.TestCase):
     def test_upper(self):
@@ -17,7 +17,7 @@ class TestStringMethods(unittest.TestCase):
             s.split(2)
 
     def test_fail(self):
-        self.assertFalse(True)
+        self.assertFalse(False)
 
 
 if __name__ == '__main__':

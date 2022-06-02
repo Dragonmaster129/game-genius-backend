@@ -75,10 +75,10 @@ externalData = {
 }
 
 
-def updateData():
-    externalData["totalIncome"] = totalUp.totalUp(externalData["assets"])
-    externalData["totalExpenses"] = totalUp.totalUp((externalData["expenses"]))
-    externalData["passive"] = totalUp.totalUp(externalData["assets"])-externalData["assets"]["salary"]
-    externalData["cashflow"] = externalData["totalIncome"]-externalData["totalExpenses"]
-    if externalData["cash"] is None:
-        externalData["cash"] = externalData["cashflow"] + externalData["savings"]
+def updateData(data):
+    data["totalIncome"] = totalUp.totalUp(data["assets"])
+    data["totalExpenses"] = totalUp.totalUp((data["expenses"]))
+    data["passive"] = totalUp.totalUp(data["assets"])-data["assets"]["salary"]
+    data["cashflow"] = data["totalIncome"]-data["totalExpenses"]
+    if data["cash"] is None:
+        data["cash"] = data["cashflow"] + data["savings"]
