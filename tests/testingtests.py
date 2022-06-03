@@ -1,5 +1,7 @@
 import unittest
+import totalUp_test
 import buy_test
+
 
 class TestStringMethods(unittest.TestCase):
     def test_upper(self):

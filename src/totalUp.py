@@ -19,6 +19,7 @@ def totalUp(objToTotal):
                     for smallObj in objToTotal[baseKey]:
                         try:
                             total += smallObj["value"]
+                            # print(smallObj)
                         except KeyError:
                             pass
                 except TypeError:

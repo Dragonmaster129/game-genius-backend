@@ -59,6 +59,10 @@ externalData = {
                 "cost": 200,
                 "downpay": 200,
                 "key": 1
+            },
+            {
+                "name": "CARD2",
+                "cashflow": 500
             }
         ],
         "stock": [

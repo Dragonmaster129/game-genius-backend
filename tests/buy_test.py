@@ -1,17 +1,30 @@
 import unittest
 from sampledata import data
 from src import buy
+import copy
 
 
 class TestBuyMethod(unittest.TestCase):
     def setUp(self) -> None:
-        self.data = data.externalData
-        self.updateData = data.updateData
-        self.updateData(self.data)
+        self.data = copy.deepcopy(data.externalData)
 
-    def resetCashTest(self):
-        self.updateData(self.data)
-        self.data["cash"] = self.data["cashflow"] + self.data["savings"]
+    def baseTest(self, card, endcard, amount=1):
+        cardType = card["type"]
+        self.assertNotIn(endcard, self.data["assets"][cardType])
+        self.data = buy.buy(card, self.data, False, amount)
+        self.assertNotIn(endcard, self.data["assets"][cardType])
+        self.data["cash"] = 255000
+        self.data = buy.buy(card, self.data, True, amount)
+        self.assertIn(endcard, self.data["assets"][cardType])
+        try:
+            self.assertEqual(self.data["cash"], 255000-card["downpay"]*amount)
+        except KeyError:
+            try:
+                self.assertEqual(self.data["cash"], 255000-card["costPerShare"] * amount)
+            except AssertionError:
+                self.assertEqual(self.data["cash"], 255000)
+            except KeyError:
+                self.assertEqual(self.data["cash"], 255000)
 
     def test_addData(self):
         self.assertEqual(self.data, data.externalData)
@@ -26,13 +39,7 @@ class TestBuyMethod(unittest.TestCase):
             "downpay": 100000,
             "value": 4500,
         }
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data["cash"] = 105000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["realestate"])
-        self.assertEqual(self.data["cash"], 105000-card["downpay"]*1)
+        self.baseTest(card, card)
 
     def test_buyDuplex(self):
         card = {
@@ -44,13 +51,7 @@ class TestBuyMethod(unittest.TestCase):
             "downpay": 8000,
             "value": 240,
         }
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data["cash"] = 10000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["realestate"])
-        self.assertEqual(self.data["cash"], 10000-card["downpay"]*1)
+        self.baseTest(card, card)
 
     def test_buyStarterHouse(self):
         card = {
@@ -62,13 +63,7 @@ class TestBuyMethod(unittest.TestCase):
             "downpay": 6000,
             "value": 20,
         }
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data["cash"] = 8000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["realestate"])
-        self.assertEqual(self.data["cash"], 8000-card["downpay"]*1)
+        self.baseTest(card, card)
 
     def test_buy4Plex(self):
         card = {
@@ -80,13 +75,7 @@ class TestBuyMethod(unittest.TestCase):
             "downpay": 16000,
             "value": 750,
         }
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data["cash"] = 20000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["realestate"])
-        self.assertEqual(self.data["cash"], 20000-card["downpay"]*1)
+        self.baseTest(card, card)
 
     def test_buy8Plex(self):
         card = {
@@ -98,13 +87,7 @@ class TestBuyMethod(unittest.TestCase):
             "downpay": 40000,
             "value": 1600,
         }
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["realestate"])
-        self.data["cash"] = 50000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["realestate"])
-        self.assertEqual(self.data["cash"], 50000-card["downpay"]*1)
+        self.baseTest(card, card)
 
     def test_buyLand(self):
         card = {
@@ -117,13 +100,7 @@ class TestBuyMethod(unittest.TestCase):
                 "value": -150,
                 "key": 1
             }
-        self.assertNotIn(card, self.data["assets"]["land"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["land"])
-        self.data["cash"] = 20000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["land"])
-        self.assertEqual(self.data["cash"], 20000-card["downpay"]*1)
+        self.baseTest(card, card)
 
     def test_buyDividend(self):
         card = {
@@ -139,13 +116,7 @@ class TestBuyMethod(unittest.TestCase):
             "value": 3800,
             "key": 2
         }
-        self.assertNotIn(card, self.data["assets"]["dividends"])
-        self.data = buy.buy(card, self.data, False, 10)
-        self.assertNotIn(shortenedCard, self.data["assets"]["dividends"])
-        self.data["cash"] = 255000
-        self.data = buy.buy(card, self.data, True, 10)
-        self.assertIn(shortenedCard, self.data["assets"]["dividends"])
-        self.assertEqual(self.data["cash"], 255000-card["downpay"]*10)
+        self.baseTest(card, shortenedCard, 10)
         
     def test_buyRegularStock(self):
         card = {
@@ -161,13 +132,7 @@ class TestBuyMethod(unittest.TestCase):
             "costPerShare": 5,
             "key": len(self.data["assets"]["stock"]) + 1
         }
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data = buy.buy(card, self.data, False, 1000)
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data["cash"] = 6000
-        self.data = buy.buy(card, self.data, True, 1000)
-        self.assertIn(endcard, self.data["assets"]["stock"])
-        self.assertEqual(self.data["cash"], 6000 - card["costPerShare"] * 1000)
+        self.baseTest(card, endcard, 1000)
 
     def test_buyPutStock(self):
         card = {
@@ -186,13 +151,7 @@ class TestBuyMethod(unittest.TestCase):
             "strikePrice": 35,
             "key": len(self.data["assets"]["stock"]) + 1
         }
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data = buy.buy(card, self.data, False, 1000)
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data["cash"] = 3000
-        self.data = buy.buy(card, self.data, True, 1000)
-        self.assertIn(endcard, self.data["assets"]["stock"])
-        self.assertEqual(self.data["cash"], 3000 - card["costPerShare"] * 1000)
+        self.baseTest(card, endcard, 1000)
 
     def test_buyCallStock(self):
         card = {
@@ -211,13 +170,7 @@ class TestBuyMethod(unittest.TestCase):
             "strikePrice": 15,
             "key": len(self.data["assets"]["stock"]) + 1
         }
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data = buy.buy(card, self.data, False, 1000)
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data["cash"] = 3000
-        self.data = buy.buy(card, self.data, True, 1000)
-        self.assertIn(endcard, self.data["assets"]["stock"])
-        self.assertEqual(self.data["cash"], 3000 - card["costPerShare"] * 1000)
+        self.baseTest(card, endcard, 1000)
 
     def test_buyShortStock(self):
         card = {
@@ -233,13 +186,7 @@ class TestBuyMethod(unittest.TestCase):
             "costPerShare": 40,
             "key": len(self.data["assets"]["stock"]) + 1
         }
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data = buy.buy(card, self.data, False, 1000)
-        self.assertNotIn(endcard, self.data["assets"]["stock"])
-        self.data["cash"] = 3000
-        self.data = buy.buy(card, self.data, True, 1000)
-        self.assertIn(endcard, self.data["assets"]["stock"])
-        self.assertEqual(self.data["cash"], 3000)
+        self.baseTest(card, endcard, 1000)
 
     def test_buyD2Y1(self):
         card = {
@@ -248,13 +195,7 @@ class TestBuyMethod(unittest.TestCase):
             "cost": 200,
             "downpay": 200
         }
-        self.assertNotIn(card, self.data["assets"]["business"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["business"])
-        self.data["cash"] = 1000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["business"])
-        self.assertEqual(self.data["cash"], 1000 - card["downpay"])
+        self.baseTest(card, card)
 
     def test_buyD2Y2(self):
         card = {
@@ -262,13 +203,7 @@ class TestBuyMethod(unittest.TestCase):
             "name": "CARD2",
             "value": 500
         }
-        self.assertNotIn(card, self.data["assets"]["business"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["business"])
-        self.data["cash"] = 1000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["business"])
-        self.assertEqual(self.data["cash"], 1000)
+        self.baseTest(card, card)
 
     def test_buyD2Y3(self):
         card = {
@@ -276,13 +211,7 @@ class TestBuyMethod(unittest.TestCase):
             "name": "CARD3",
             "value": 5000
         }
-        self.assertNotIn(card, self.data["assets"]["business"])
-        self.data = buy.buy(card, self.data, False)
-        self.assertNotIn(card, self.data["assets"]["business"])
-        self.data["cash"] = 1000
-        self.data = buy.buy(card, self.data, True)
-        self.assertIn(card, self.data["assets"]["business"])
-        self.assertEqual(self.data["cash"], 1000)
+        self.baseTest(card, card)
 
 
 # How to run the tests when this file isn't the main
@@ -295,6 +224,7 @@ def suite():
     return suite
 
 
+# Change the name to the name of the file dropping the .py
 if __name__ == "buy_test":
     runner = unittest.TextTestRunner()
     runner.run(suite())
