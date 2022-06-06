@@ -109,7 +109,6 @@ class TestBuyMethod(unittest.TestCase):
             "cost": 25000,
             "downpay": 25000,
             "value": 380,
-            "key": 1
         }
         shortenedCard = {
             "name": "Long Term Bonds",
@@ -218,7 +217,7 @@ class TestBuyMethod(unittest.TestCase):
 def suite():
     suite = unittest.TestSuite()
     method_list = [func for func in dir(TestBuyMethod)
-                   if callable(getattr(TestBuyMethod, func)) and func.startswith("test")]
+                   if callable(getattr(TestBuyMethod, func)) and func.startswith("test_")]
     for i in method_list:
         suite.addTest((TestBuyMethod(i)))
     return suite

@@ -54,16 +54,16 @@ externalData = {
             }
         ],
         "business": [
-            {
-                "name": "CARD1",
-                "cost": 200,
-                "downpay": 200,
-                "key": 1
-            },
-            {
-                "name": "CARD2",
-                "cashflow": 500
-            }
+            # {
+            #     "name": "CARD1",
+            #     "cost": 200,
+            #     "downpay": 200,
+            #     "key": 1
+            # },
+            # {
+            #     "name": "CARD2",
+            #     "value": 500
+            # }
         ],
         "stock": [
             {"name": "OK4U", "option": "PUT", "turns": 2, "amount": 1000, "strikePrice": 40, "costPerShare": 1, "key": 1}
