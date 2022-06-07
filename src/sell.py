@@ -19,6 +19,12 @@ def sell(itemData, data, playerAction, price, amount=1):
                 exitingData["amount"] -= amount
                 if exitingData["amount"] > 0:
                     data[itemData[0]][itemData[1]].append(exitingData)
+            if exitingData["option"] == "PUT":
+                data["cash"] += (exitingData["strikePrice"] - price) * exitingData["amount"]
+            if exitingData["option"] == "CALL":
+                data["cash"] += (price - exitingData["strikePrice"]) * exitingData["amount"]
+            if exitingData["option"] == "SHORT":
+                data["cash"] += (exitingData["strikePrice"] - price) * exitingData["amount"]
 
     data[itemData[0]][itemData[1]] = resetKeyValues.resetKeyValues(data[itemData[0]][itemData[1]])
 

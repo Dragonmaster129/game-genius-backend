@@ -176,6 +176,42 @@ class TestSellMethod(unittest.TestCase):
         self.assertNotIn(endCard, self.data["assets"]["stock"])
         self.assertEqual(43950, self.data["cash"])
 
+    def test_sellPutStock(self):
+        card = {"name": "OK4U", "option": "PUT", "turns": 2, "amount": 1000, "strikePrice": 40, "costPerShare": 1, "key": 1}
+        iteration = 0
+        for i in self.data["assets"]["stock"]:
+            iteration += 1
+            if i == card:
+                break
+        self.assertIn(card, self.data["assets"]["stock"])
+        sell.sell(["assets", "stock", iteration], self.data, True, 30)
+        self.assertNotIn(card, self.data["assets"]["stock"])
+        self.assertEqual(13950, self.data["cash"])
+
+    def test_sellCallStock(self):
+        card = {"name": "OK4U", "option": "CALL", "turns": 3, "amount": 1000, "strikePrice": 15, "costPerShare": 1, "key": 3}
+        iteration = 0
+        for i in self.data["assets"]["stock"]:
+            iteration += 1
+            if i == card:
+                break
+        self.assertIn(card, self.data["assets"]["stock"])
+        sell.sell(["assets", "stock", iteration], self.data, True, 30)
+        self.assertNotIn(card, self.data["assets"]["stock"])
+        self.assertEqual(18950, self.data["cash"])
+
+    def test_sellShortStock(self):
+        card = {"name": "MYT4U", "option": "SHORT", "amount": 1000, "strikePrice": 50, "key": 4}
+        iteration = 0
+        for i in self.data["assets"]["stock"]:
+            iteration += 1
+            if i == card:
+                break
+        self.assertIn(card, self.data["assets"]["stock"])
+        sell.sell(["assets", "stock", iteration], self.data, True, 30)
+        self.assertNotIn(card, self.data["assets"]["stock"])
+        self.assertEqual(23950, self.data["cash"])
+
 
 def suite():
     suite = unittest.TestSuite()
