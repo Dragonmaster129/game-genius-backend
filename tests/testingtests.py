@@ -1,6 +1,7 @@
 import unittest
 import totalUp_test
 import buy_test
+import sell_test
 
 
 class TestStringMethods(unittest.TestCase):

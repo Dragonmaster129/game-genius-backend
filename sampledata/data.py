@@ -24,8 +24,8 @@ externalData = {
         ],
         "realestate": [
             {
-                "type": "3/2",
-                "name": "3/2 House",
+                "name": "STARTERHOUSE",
+                "size": 1,
                 "cost": 55000,
                 "mortgage": 50000,
                 "downpay": 5000,
@@ -33,13 +33,22 @@ externalData = {
                 "key": 1,
             },
             {
-                "type": "3/2",
-                "name": "3/2 House",
+                "name": "STARTERHOUSE",
+                "size": 1,
                 "cost": 55000,
                 "mortgage": 48000,
                 "downpay": 7000,
                 "value": 400,
                 "key": 2,
+            },
+            {
+                "name": "4-PLEX",
+                "size": 4,
+                "cost": 55000,
+                "mortgage": 48000,
+                "downpay": 7000,
+                # "value": 400,
+                "key": 3,
             },
         ],
         "land": [
@@ -66,7 +75,12 @@ externalData = {
             # }
         ],
         "stock": [
-            {"name": "OK4U", "option": "PUT", "turns": 2, "amount": 1000, "strikePrice": 40, "costPerShare": 1, "key": 1}
+            {"name": "OK4U", "option": "PUT", "turns": 2, "amount": 1000, "strikePrice": 40, "costPerShare": 1,
+             "key": 1},
+            {"name": "OK4U", "option": "REGULAR", "amount": 1000, "costPerShare": 1, "key": 2},
+            {"name": "OK4U", "option": "CALL", "turns": 3, "amount": 1000, "strikePrice": 15, "costPerShare": 1,
+             "key": 3},
+            {"name": "MYT4U", "option": "SHORT", "amount": 1000, "strikePrice": 50, "key": 4}
         ],
     },
     "expenses": {
