@@ -4,7 +4,7 @@ externalData = {
     "totalIncome": 13200,
     "totalExpenses": 9650,
     "passive": 0,
-    "cashflow": 3500,
+    "cashflow": 3550,
     "cash": None,
     "player": 3,
     "profession": "Doctor",

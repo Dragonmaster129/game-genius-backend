@@ -2,6 +2,8 @@ import unittest
 import totalUp_test
 import buy_test
 import sell_test
+import borrowLoan_test
+import payLoan_test
 
 
 class TestStringMethods(unittest.TestCase):
