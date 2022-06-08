@@ -4,6 +4,7 @@ import buy_test
 import sell_test
 import borrowLoan_test
 import payLoan_test
+import paycheck_test
 
 
 class TestStringMethods(unittest.TestCase):
