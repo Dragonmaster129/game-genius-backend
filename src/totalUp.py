@@ -29,18 +29,17 @@ def totalUp(objToTotal):
                     except:
                         raise TypeError
                 except TypeError:
-                    try:
-                        for smallObj in objToTotal[baseKey]:
-                            try:
-                                total += smallObj["value"]
-                            except KeyError:
-                                pass
-                    except TypeError:
-                        obj = objToTotal[baseKey]
+                    for smallObj in objToTotal[baseKey]:
                         try:
-                            total += obj["monthly"]
+                            total += smallObj["value"]
                         except KeyError:
-                            total += obj["count"]*obj["costPer"]
+                            try:
+                                total += smallObj["monthly"]
+                            except KeyError:
+                                try:
+                                    total += smallObj["count"]*smallObj["costPer"]
+                                except KeyError:
+                                    pass
     except ValueError:
         print("error")
     return total
