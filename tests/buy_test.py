@@ -212,6 +212,27 @@ class TestBuyMethod(unittest.TestCase):
         }
         self.baseTest(card, card)
 
+    def test_buyRoyalty(self):
+        card = {
+            "type": "dividends",
+            "name": "Toy Sells",
+            "cost": 12000,
+            "downpay": 12000,
+            "value": 400,
+        }
+        shortenedCard = {
+            "name": "Toy Sells",
+            "value": 400,
+            "key": 2
+        }
+        self.assertNotIn(shortenedCard, self.data["assets"]["dividends"])
+        self.data = buy.buy(card, self.data, False)
+        self.assertNotIn(shortenedCard, self.data["assets"]["dividends"])
+        self.data["cash"] = 255000
+        self.data = buy.buy(card, self.data, True)
+        self.assertIn(shortenedCard, self.data["assets"]["dividends"])
+        self.assertEqual(self.data["cash"], 255000 - card["downpay"])
+
 
 # How to run the tests when this file isn't the main
 def suite():

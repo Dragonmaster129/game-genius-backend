@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import doodad
+from src import doodad, checkBaby
 import copy
 
 
@@ -39,7 +39,7 @@ class TestDoodad(unittest.TestCase):
     def test_doNotPayCashIfHasNoChild(self):
         self.updateData(self.data)
         self.assertEqual(self.data["cash"], 4670)
-        if self.data["expenses"]["child"][0]["count"] > 0:
+        if checkBaby.checkBaby(self.data):
             self.data = doodad.doodad(self.data, cash=(self.data["expenses"]["child"][0]["count"] * 50))
         self.assertEqual(self.data["cash"], 4670)
 
@@ -47,14 +47,14 @@ class TestDoodad(unittest.TestCase):
         self.updateData(self.data)
         self.assertEqual(self.data["cash"], 4670)
         self.data["expenses"]["child"][0]["count"] = 1
-        if self.data["expenses"]["child"][0]["count"] > 0:
+        if checkBaby.checkBaby(self.data):
             self.data = doodad.doodad(self.data, cash=(self.data["expenses"]["child"][0]["count"] * 50))
         self.assertEqual(self.data["cash"], 4620)
 
     def test_doNotPayAndCashFlowIfHasNoChild(self):
         self.updateData(self.data)
         self.assertEqual(self.data["cash"], 4670)
-        if self.data["expenses"]["child"][0]["count"] > 0:
+        if checkBaby.checkBaby(self.data):
             self.data = doodad.doodad(self.data, cash=500, cashflow=100)
         self.assertEqual(self.data["cash"], 4670)
         self.assertEqual(self.data["expenses"]["other"], 2880)
@@ -63,7 +63,7 @@ class TestDoodad(unittest.TestCase):
         self.updateData(self.data)
         self.assertEqual(self.data["cash"], 4670)
         self.data["expenses"]["child"][0]["count"] = 1
-        if self.data["expenses"]["child"][0]["count"] > 0:
+        if checkBaby.checkBaby(self.data):
             self.data = doodad.doodad(self.data, cash=500, cashflow=100)
         self.assertEqual(self.data["cash"], 4170)
         self.assertEqual(self.data["expenses"]["other"], 2980)
