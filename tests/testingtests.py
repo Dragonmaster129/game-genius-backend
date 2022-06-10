@@ -6,6 +6,7 @@ import borrowLoan_test
 import payLoan_test
 import paycheck_test
 import doodad_test
+import insurance_test
 
 
 class TestStringMethods(unittest.TestCase):
