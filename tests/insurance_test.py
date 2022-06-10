@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import insurance
+from src.markets import insurance
 import copy
 
 

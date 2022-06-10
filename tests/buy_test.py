@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import buy
+from src.basic import buy
 import copy
 
 

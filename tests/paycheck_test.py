@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import paycheck
+from src.basic import paycheck
 import copy
 
 

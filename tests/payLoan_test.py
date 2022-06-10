@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import payLoan
+from src.basic import payLoan
 import copy
 
 

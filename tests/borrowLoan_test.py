@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import borrowLoan
+from src.basic import borrowLoan
 import copy
 
 

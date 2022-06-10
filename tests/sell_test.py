@@ -1,6 +1,6 @@
 import unittest
 from sampledata import data
-from src import sell, buy
+from src.basic import sell, buy
 import copy
 
 
