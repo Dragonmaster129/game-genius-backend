@@ -12,25 +12,25 @@ class TestBorrowLoan(unittest.TestCase):
 
     def test_borrowLoan(self):
         self.updateData(self.data)
-        self.assertEqual(self.data["cashflow"], 4270)
+        self.assertEqual(self.data["cashflow"], 4670)
         self.assertEqual(self.data["expenses"]["loan"], 0)
         self.assertEqual(self.data["cash"], 3950)
         borrowLoan.borrowLoan(self.data, 1000)
         self.assertEqual(self.data["expenses"]["loan"], 1000)
         self.assertEqual(self.data["cash"], 4950)
         self.updateData(self.data)
-        self.assertEqual(self.data["cashflow"], 4170)
+        self.assertEqual(self.data["cashflow"], 4570)
 
     def test_borrowBiggerLoan(self):
         self.updateData(self.data)
-        self.assertEqual(self.data["cashflow"], 4270)
+        self.assertEqual(self.data["cashflow"], 4670)
         self.assertEqual(self.data["expenses"]["loan"], 0)
         self.assertEqual(self.data["cash"], 3950)
         borrowLoan.borrowLoan(self.data, 13000)
         self.assertEqual(self.data["expenses"]["loan"], 13000)
         self.assertEqual(self.data["cash"], 16950)
         self.updateData(self.data)
-        self.assertEqual(self.data["cashflow"], 2970)
+        self.assertEqual(self.data["cashflow"], 3370)
 
 
 # How to run the tests when this file isn't the main

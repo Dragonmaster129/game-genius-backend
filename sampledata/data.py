@@ -48,7 +48,7 @@ externalData = {
                 "cost": 55000,
                 "mortgage": 48000,
                 "downpay": 7000,
-                # "value": 400,
+                "value": 400,
                 "key": 3,
             },
         ],

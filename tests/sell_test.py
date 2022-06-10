@@ -37,6 +37,7 @@ class TestSellMethod(unittest.TestCase):
                 "cost": 55000,
                 "mortgage": 48000,
                 "downpay": 7000,
+                "value": 400,
                 "key": 3,
             }
         iteration = 0

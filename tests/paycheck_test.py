@@ -11,9 +11,9 @@ class TestPaycheck(unittest.TestCase):
 
     def test_cashIncreased(self):
         self.updateData(self.data)
-        self.assertEqual(self.data["cash"], 4670)
+        self.assertEqual(self.data["cash"], 5070)
         paycheck.paycheck(self.data)
-        self.assertEqual(self.data["cash"], 4670 + self.data["cashflow"])
+        self.assertEqual(self.data["cash"], 5070 + self.data["cashflow"])
 
 
 def suite():
