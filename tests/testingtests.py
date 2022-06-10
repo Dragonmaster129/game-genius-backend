@@ -7,6 +7,7 @@ import payLoan_test
 import paycheck_test
 import doodad_test
 import insurance_test
+import naturalDisaster_test
 
 
 class TestStringMethods(unittest.TestCase):
