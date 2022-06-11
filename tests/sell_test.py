@@ -145,7 +145,8 @@ class TestSellMethod(unittest.TestCase):
             "costPerShare": 1,
             "key": len(self.data["assets"]["stock"])+1
         }
-        endCard = {"name": "OK4U", "option": "REGULAR", "costPerShare": 1, "amount": 100, "key": len(self.data["assets"]["stock"])+1}
+        endCard = {"name": "OK4U", "option": "REGULAR", "costPerShare": 1, "amount": 100,
+                   "key": len(self.data["assets"]["stock"])+1}
         self.data = buy.buy(buyCard, self.data, True, 1000)
         iteration = 0
         for i in self.data["assets"]["stock"]:
@@ -178,7 +179,8 @@ class TestSellMethod(unittest.TestCase):
         self.assertEqual(43950, self.data["cash"])
 
     def test_sellPutStock(self):
-        card = {"name": "OK4U", "option": "PUT", "turns": 2, "amount": 1000, "strikePrice": 40, "costPerShare": 1, "key": 1}
+        card = {"name": "OK4U", "option": "PUT", "turns": 2, "amount": 1000, "strikePrice": 40, "costPerShare": 1,
+                "key": 1}
         iteration = 0
         for i in self.data["assets"]["stock"]:
             iteration += 1
@@ -190,7 +192,8 @@ class TestSellMethod(unittest.TestCase):
         self.assertEqual(13950, self.data["cash"])
 
     def test_sellCallStock(self):
-        card = {"name": "OK4U", "option": "CALL", "turns": 3, "amount": 1000, "strikePrice": 15, "costPerShare": 1, "key": 3}
+        card = {"name": "OK4U", "option": "CALL", "turns": 3, "amount": 1000, "strikePrice": 15, "costPerShare": 1,
+                "key": 3}
         iteration = 0
         for i in self.data["assets"]["stock"]:
             iteration += 1
