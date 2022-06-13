@@ -8,6 +8,7 @@ externalData = {
     "cash": None,
     "charity": 0,
     "downsized": 0,
+    "mentor": 0,
     "player": 3,
     "profession": "Doctor",
     "auditor": "Sam",

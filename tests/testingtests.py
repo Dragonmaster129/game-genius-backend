@@ -13,6 +13,7 @@ import baby_test
 import charity_test
 import downsized_test
 import forcedSale_test
+import mentor_test
 
 
 class TestStringMethods(unittest.TestCase):
