@@ -15,6 +15,7 @@ import downsized_test
 import forcedSale_test
 import mentor_test
 import REUpgrade_test
+import recessionTradeImproves_test
 
 
 class TestStringMethods(unittest.TestCase):
