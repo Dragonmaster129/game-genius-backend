@@ -9,6 +9,7 @@ import doodad_test
 import insurance_test
 import naturalDisaster_test
 import pollution_test
+import baby_test
 
 
 class TestStringMethods(unittest.TestCase):
