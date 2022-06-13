@@ -6,6 +6,7 @@ externalData = {
     "passive": 0,
     "cashflow": 3550,
     "cash": None,
+    "charity": 0,
     "player": 3,
     "profession": "Doctor",
     "auditor": "Sam",
