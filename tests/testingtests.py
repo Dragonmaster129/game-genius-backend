@@ -11,6 +11,7 @@ import naturalDisaster_test
 import pollution_test
 import baby_test
 import charity_test
+import downsized_test
 
 
 class TestStringMethods(unittest.TestCase):

@@ -7,6 +7,7 @@ externalData = {
     "cashflow": 3550,
     "cash": None,
     "charity": 0,
+    "downsized": 0,
     "player": 3,
     "profession": "Doctor",
     "auditor": "Sam",
