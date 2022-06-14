@@ -95,7 +95,7 @@ class TestDoodad(unittest.TestCase):
         self.assertEqual(self.data["downsizedImmunity"], False)
         self.data = doodad.doodad(self.data, category="GOOD")
         self.assertEqual(self.data["cash"], 10070)
-        self.assertEqual(self.data["downsizedImmunity"], True)
+        self.assertEqual(self.data["downsizedImmunity"], 1)
 
     def test_expensive(self):
         self.updateData(self.data)

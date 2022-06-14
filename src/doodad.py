@@ -14,6 +14,6 @@ def doodad(data, cash=None, cashflow=None, category=None):
                 data["expenses"][category][len(data["expenses"][category])-1][i] = cashflow[i]
     if category == "GOOD":
         data["cash"] += 5000
-        data["downsizedImmunity"] = True
+        data["downsizedImmunity"] = 1
 
     return data

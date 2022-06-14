@@ -13,7 +13,7 @@ externalData = {
     "profession": "Doctor",
     "auditor": "Sam",
     "savings": 400,
-    "downsizedImmunity": False,
+    "downsizedImmunity": 0,
     "assets": {
         "salary": 13200,
         "interest": [
