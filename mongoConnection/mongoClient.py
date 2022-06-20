@@ -1,10 +1,10 @@
 from pymongo import MongoClient
 
 
-def client():
+def client(database):
     mo_c = MongoClient()
 
-    db = mo_c.cashflowDB
+    db = mo_c[database]
 
     # collections = db.list_collection_names()
     # print("collections:", collections)
@@ -20,7 +20,7 @@ def client():
     #             print(x["description"])
     #         # print(x)
 
-    col = db["doodad"]
+    # col = db["doodad"]
 
     # How to Insert into the collection in the db
     # insert = "n"
