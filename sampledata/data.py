@@ -84,7 +84,7 @@ externalData = {
             {"name": "OK4U", "option": "REGULAR", "amount": 1000, "costPerShare": 1, "key": 2},
             {"name": "OK4U", "option": "CALL", "turns": 3, "amount": 1000, "strikePrice": 15, "costPerShare": 1,
              "key": 3},
-            {"name": "MYT4U", "option": "SHORT", "amount": 1000, "strikePrice": 50, "key": 4}
+            {"name": "MYT4U", "option": "SHORT", "amount": 1000, "strikePrice": 50, "cost": 0, "key": 4}
         ],
     },
     "expenses": {

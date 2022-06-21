@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 
 from sampledata import data
+import copy
 
 from src import totalUp
 # from pymongo import MongoClient
@@ -10,32 +11,8 @@ from src import totalUp
 # App initialization
 app = FastAPI()
 
-
-class Player:
-    def __init__(self, data):
-        self.data = data
-
-
-externalData = data.externalData
-data.updateData()
-
-
-players = {
-    "player1": Player(externalData),
-    "player2": Player(externalData),
-    "player3": Player(externalData),
-    "player4": Player(externalData)
-}
-
-card = {
-    "type": "realestate",
-    "name": "APARTMENTCOMPLEX",
-    "size": 30,
-    "cost": 800000,
-    "mortgage": 700000,
-    "downpay": 100000,
-    "value": 4500,
-}
+externalData = copy.deepcopy(data.externalData)
+data.updateData(externalData)
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -55,5 +32,4 @@ app.add_middleware(
 
 @app.get("/data")
 async def get(request: Request):
-    request = request
     return json.dumps(externalData)
