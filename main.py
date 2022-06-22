@@ -6,7 +6,7 @@ from bson import json_util
 
 from sampledata import data
 from pydantic import BaseModel
-from mongoConnection import playerLogin, getPlayerData
+from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient
 import copy
 
 from src import totalUp
@@ -41,21 +41,33 @@ class LoginData(BaseModel):
 
 
 tokens = {}
+professions = []
+temps = mongoClient.client("cashflowDB")["initialData"]
+temp = temps.find({})
+for i in temp:
+    professions.append(i["profession"])
 
 
 @app.get("/data/{tokenID}")
-async def get(tokenID):
-    print("RIGHTHERE!!")
+async def getData(tokenID):
     if tokenID in tokens:
         return json_util.dumps(getPlayerData.getPlayerData(tokens[tokenID]))
     return json.dumps("invalid token")
 
 
 @app.post("/login")
-async def post(request: LoginData):
+async def login(request: LoginData):
     if playerLogin.login(request.email, request.password):
         token = uuid.uuid4().hex
         tokens[token] = request.email
         return json.dumps(token)
     else:
         return False
+
+
+@app.post("/reset/{tokenID}/")
+async def reset(tokenID):
+    if tokenID in tokens:
+        resetPlayer.initializePlayerData(tokens[tokenID])
+        return True
+    return False

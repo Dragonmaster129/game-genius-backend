@@ -20,4 +20,7 @@ def createUser(email, pwd):
     return playerData
 
 
-# user = createUser("test2@test.com", "RandomPassword1")
+# # create 10 unique users
+# for i in range(10):
+#     user = createUser(f"test{i}@test.com", "RandomPassword")
+#     print(user)
