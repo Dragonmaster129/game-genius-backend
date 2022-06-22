@@ -1,8 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import uuid
+from bson import json_util
 
 from sampledata import data
+from pydantic import BaseModel
+from mongoConnection import playerLogin, getPlayerData
 import copy
 
 from src import totalUp
@@ -19,6 +23,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:8080/play",
 ]
 
 app.add_middleware(
@@ -30,6 +35,27 @@ app.add_middleware(
 )
 
 
-@app.get("/data")
-async def get(request: Request):
-    return json.dumps(externalData)
+class LoginData(BaseModel):
+    email: str
+    password: str
+
+
+tokens = {}
+
+
+@app.get("/data/{tokenID}")
+async def get(tokenID):
+    print("RIGHTHERE!!")
+    if tokenID in tokens:
+        return json_util.dumps(getPlayerData.getPlayerData(tokens[tokenID]))
+    return json.dumps("invalid token")
+
+
+@app.post("/login")
+async def post(request: LoginData):
+    if playerLogin.login(request.email, request.password):
+        token = uuid.uuid4().hex
+        tokens[token] = request.email
+        return json.dumps(token)
+    else:
+        return False
