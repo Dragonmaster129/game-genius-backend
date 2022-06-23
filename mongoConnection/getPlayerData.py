@@ -1,7 +1,14 @@
-from mongoConnection import mongoClient
+from mongoConnection import mongoClient, resetPlayer
 
 
 def getPlayerData(email):
     db = mongoClient.client("cashflowDB")
-    print(db["player"].find({"email": email})[0]["playerData"])
-    return db["player"].find({"email": email})[0]["playerData"]
+    try:
+        playerData = db["player"].find({"email": email})[0]["playerData"]
+        playerData.pop("_id")
+        return playerData
+    except KeyError:
+        resetPlayer.initializePlayerData(email)
+        playerData = db["player"].find({"email": email})[0]["playerData"]
+        playerData.pop("_id")
+        return playerData

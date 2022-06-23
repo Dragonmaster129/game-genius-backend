@@ -10,6 +10,15 @@ def login(email, password):
         return False
 
 
+def auth(email):
+    db = mongoClient.client("cashflowDB")
+    player = db["player"].find({"email": email})[0]
+    if player["auth"] == 1:
+        return True
+    else:
+        return False
+
+
 # loginSuccessful = login("test@test.com", "RandomPassword")
 # if loginSuccessful:
 #     print("Logged in successfully")

@@ -1,16 +1,16 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import uuid
 from bson import json_util
+import copy
+import time
+# from pymongo import MongoClient
 
 from sampledata import data
 from pydantic import BaseModel
-from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient
-import copy
-
-from src import totalUp
-# from pymongo import MongoClient
+from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard
+# from src import totalUp
 
 # App initialization
 app = FastAPI()
@@ -40,7 +40,18 @@ class LoginData(BaseModel):
     password: str
 
 
-tokens = {}
+class DoodadCard(BaseModel):
+    cardType: str
+    cashflow: int
+    cash: int
+    baby: bool
+    cashflowType: str
+    token: str
+    description: str
+
+
+tokens = {"1": "test@test.com"}
+authTokens = {"1": "test@test.com"}
 professions = []
 temps = mongoClient.client("cashflowDB")["initialData"]
 temp = temps.find({})
@@ -57,9 +68,12 @@ async def getData(tokenID):
 
 @app.post("/login")
 async def login(request: LoginData):
+    time.sleep(1)
     if playerLogin.login(request.email, request.password):
         token = uuid.uuid4().hex
         tokens[token] = request.email
+        if playerLogin.auth(request.email):
+            authTokens[token] = request.email
         return json.dumps(token)
     else:
         return False
@@ -69,5 +83,13 @@ async def login(request: LoginData):
 async def reset(tokenID):
     if tokenID in tokens:
         resetPlayer.initializePlayerData(tokens[tokenID])
+        return True
+    return False
+
+
+@app.post("/card/add/")
+async def addCardData(cardData: DoodadCard):
+    if cardData.token in authTokens:
+        createCard.createCard(cardData)
         return True
     return False
