@@ -29,3 +29,19 @@ def forcedSale(cardType, data, price):
 
     # print(data["assets"][i])
     # sell.sell(itemData, data, True, price)
+
+
+def findHighest(data):
+    highest = ["", 0]
+    for i in data["assets"]:
+        if i == "realestate" or i == "land":
+            iteration = 0
+            for item in data["assets"][i]:
+                try:
+                    if item["value"] > highest[2]:
+                        highest = [i, iteration, item["value"]]
+                    iteration += 1
+                except IndexError:
+                    highest = [i, iteration, item["value"]]
+                    iteration += 1
+    return highest

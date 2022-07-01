@@ -24,18 +24,6 @@ class TestForcedSale(unittest.TestCase):
         self.assertEqual(self.data["cash"], 10070)
 
     def test_forcedSaleHighestProperty(self):
-        highest = ["", 0]
-        for i in self.data["assets"]:
-            if i == "realestate" or i == "land":
-                iteration = 0
-                for item in self.data["assets"][i]:
-                    try:
-                        if item["value"] > highest[2]:
-                            highest = [i, iteration, item["value"]]
-                        iteration += 1
-                    except IndexError:
-                        highest = [i, iteration, item["value"]]
-                        iteration += 1
         item = {
             "name": "STARTERHOUSE",
             "size": 1,
@@ -45,6 +33,7 @@ class TestForcedSale(unittest.TestCase):
             "value": 400,
             "key": 2,
         }
+        highest = forcedSale.findHighest(self.data)
         self.assertEqual(self.data["cash"], 5070)
         self.assertIn(item, self.data["assets"]["realestate"])
         forcedSale.forcedSale(highest, self.data, self.data["assets"][highest[0]][highest[1]]["cost"])

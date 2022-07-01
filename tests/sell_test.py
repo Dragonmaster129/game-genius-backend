@@ -205,7 +205,7 @@ class TestSellMethod(unittest.TestCase):
         self.assertEqual(18950, self.data["cash"])
 
     def test_sellShortStock(self):
-        card = {"name": "MYT4U", "option": "SHORT", "amount": 1000, "strikePrice": 50, "key": 4}
+        card = {"name": "MYT4U", "option": "SHORT", "amount": 1000, "strikePrice": 50, "cost": 0, "key": 4}
         iteration = 0
         for i in self.data["assets"]["stock"]:
             iteration += 1
