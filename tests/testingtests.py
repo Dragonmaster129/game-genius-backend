@@ -17,6 +17,7 @@ import mentor_test
 import REUpgrade_test
 import recessionTradeImproves_test
 import exitRatRace_test
+import game_test
 
 
 class TestStringMethods(unittest.TestCase):
