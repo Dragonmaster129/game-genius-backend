@@ -64,6 +64,16 @@ class TestGameplay(unittest.TestCase):
         self.game.nextTurn()
         self.assertNotEqual(currentTurn, self.game.currentTurn)
 
+    def test_nextTurnIfSkipped(self):
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["downsized"], 0)
+        self.game.downsizedCurrentPlayer()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["downsized"], 2)
+        self.game.nextTurn()
+        self.assertEqual(self.game.currentTurn, 1)
+        self.game.nextTurn()
+        self.assertEqual(self.game.currentTurn, 1)
+        self.assertEqual(self.game.playerList[0].returnMsg(), "SKIPPED")
+
 
 def suite():
     suite = unittest.TestSuite()

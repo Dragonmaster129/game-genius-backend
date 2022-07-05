@@ -20,9 +20,12 @@ class Game:
 
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
-        if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData):
+        if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()
+
+    def downsizedCurrentPlayer(self):
+        downsized.downsized(self.playerList[self.currentTurn].playerData["playerData"])
 
     def playerToRightSingle(self):
         self.currentTarget = (self.currentTurn - 1) % len(self.playerList)
