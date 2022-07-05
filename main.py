@@ -74,7 +74,8 @@ async def login(request: LoginData):
         tokens[token] = request.email
         if playerLogin.auth(request.email):
             authTokens[token] = request.email
-        return json.dumps(token)
+            return json.dumps([token, 1])
+        return json.dumps([token, 0])
     else:
         return False
 
@@ -87,7 +88,7 @@ async def reset(tokenID):
     return False
 
 
-@app.post("/card/add/")
+@app.post("/card/add/doodad")
 async def addCardData(cardData: DoodadCard):
     if cardData.token in authTokens:
         createCard.createCard(cardData)
