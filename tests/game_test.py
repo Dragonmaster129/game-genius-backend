@@ -2,6 +2,7 @@ from src.objects import game
 import unittest
 from mongoConnection import getPlayerData
 from tests import player_test
+import copy
 
 
 class TestGame(game.Game):
@@ -56,6 +57,12 @@ class TestGameplay(unittest.TestCase):
         self.game.sendMsgToAllPlayers("The message.")
         self.assertEqual(self.game.playerList[0].returnMsg(), "The message.")
         self.assertEqual(self.game.playerList[1].returnMsg(), "The message.")
+
+    def test_nextTurn(self):
+        currentTurn = copy.deepcopy(self.game.currentTurn)
+        self.assertEqual(currentTurn, self.game.currentTurn)
+        self.game.nextTurn()
+        self.assertNotEqual(currentTurn, self.game.currentTurn)
 
 
 def suite():

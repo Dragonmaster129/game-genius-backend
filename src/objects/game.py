@@ -1,3 +1,5 @@
+from src.basic import downsized
+
 class Game:
     def __init__(self, ID, playerList):
         self.id = ID
@@ -18,6 +20,9 @@ class Game:
 
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
+        if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData):
+            self.sendMsgToCurrentPlayer("SKIPPED")
+            self.nextTurn()
 
     def playerToRightSingle(self):
         self.currentTarget = (self.currentTurn - 1) % len(self.playerList)
