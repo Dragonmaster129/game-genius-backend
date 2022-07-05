@@ -1,9 +1,6 @@
 from src.objects import game
 import unittest
-from sampledata import data
-from src.basic import buy
-from mongoConnection import mongoClient
-import copy
+from mongoConnection import getPlayerData
 from tests import player_test
 
 
@@ -14,20 +11,51 @@ class TestGame(game.Game):
 
 class TestGameplay(unittest.TestCase):
     def setUp(self) -> None:
-        self.db = mongoClient.client("cashflowDB")
-        self.game = TestGame(10, [player_test.TestPlayer(self.db["player"].find({"email": "test1@test.com"})[0]),
-                                  player_test.TestPlayer(self.db["player"].find({"email": "test2@test.com"})[0])])
+        self.game = TestGame(10, [player_test.TestPlayer(getPlayerData.getPlayerData("test1@test.com")),
+                                  player_test.TestPlayer(getPlayerData.getPlayerData("test2@test.com"))])
+
+    def test_startGame(self):
+        self.assertFalse(self.game.gameStarted)
+        self.game.startGame()
+        self.assertTrue(self.game.gameStarted)
 
     def test_addPlayer(self):
-        self.assertNotIn(self.db["player"].find({"email": "test@test.com"})[0],
+        self.assertNotIn(getPlayerData.getPlayerData("test@test.com"),
                          self.game.getPlayerList())
-        self.game.addPlayer(self.db["player"].find({"email": "test@test.com"})[0])
-        self.assertIn(self.db["player"].find({"email": "test@test.com"})[0], self.game.getPlayerList())
+        self.game.addPlayer(getPlayerData.getPlayerData("test@test.com"))
+        self.assertIn(getPlayerData.getPlayerData("test@test.com"), self.game.getPlayerList())
+
+    def test_cannotAddPlayerIfGameStarted(self):
+        self.assertNotIn(getPlayerData.getPlayerData("test@test.com"), self.game.getPlayerList())
+        self.game.startGame()
+        self.game.addPlayer(getPlayerData.getPlayerData("test@test.com"))
+        self.assertNotIn(getPlayerData.getPlayerData("test@test.com"), self.game.getPlayerList())
 
     def test_playerToRight(self):
         self.assertEqual(self.game.getCurrentTarget(), self.game.getCurrentPlayer())
         self.game.playerToRightSingle()
         self.assertEqual(self.game.getCurrentTarget()-1 % len(self.game.getPlayerList()), self.game.getCurrentPlayer())
+
+    def test_sendMsgToCurrentPlayer(self):
+        self.assertNotEqual(self.game.playerList[self.game.currentTurn].returnMsg(), "This is message.")
+        self.game.sendMsgToCurrentPlayer("This is message.")
+        self.assertEqual(self.game.playerList[self.game.currentTurn].returnMsg(), "This is message.")
+
+    def test_sendMsgToCurrentTargetNotCurrentPlayer(self):
+        self.game.playerToRightSingle()
+        self.assertNotEqual(self.game.getCurrentTarget(), self.game.getCurrentPlayer())
+        self.assertNotEqual(self.game.playerList[self.game.currentTarget].returnMsg(), "This is the message.")
+        self.assertNotEqual(self.game.playerList[self.game.currentTurn].returnMsg(), "This is the message.")
+        self.game.sendMsgToCurrentTarget("This is the message.")
+        self.assertEqual(self.game.playerList[self.game.currentTarget].returnMsg(), "This is the message.")
+        self.assertNotEqual(self.game.playerList[self.game.currentTurn].returnMsg(), "This is the message.")
+
+    def test_sendMsdToAllPlayers(self):
+        self.assertNotEqual(self.game.playerList[0].returnMsg(), "The message.")
+        self.assertNotEqual(self.game.playerList[1].returnMsg(), "The message.")
+        self.game.sendMsgToAllPlayers("The message.")
+        self.assertEqual(self.game.playerList[0].returnMsg(), "The message.")
+        self.assertEqual(self.game.playerList[1].returnMsg(), "The message.")
 
 
 def suite():

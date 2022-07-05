@@ -9,6 +9,9 @@ class Game:
         self.currentTarget = 0
         self.gameStarted = False
 
+    def startGame(self):
+        self.gameStarted = True
+
     def saveData(self, collection):
         # TODO save the data
         pass
@@ -22,6 +25,12 @@ class Game:
     def sendMsgToAllPlayers(self, msg):
         for player in self.playerList:
             player.sendMsg(msg)
+
+    def sendMsgToCurrentPlayer(self, msg):
+        self.playerList[self.currentTurn].sendMsg(msg)
+
+    def sendMsgToCurrentTarget(self, msg):
+        self.playerList[self.currentTarget].sendMsg(msg)
 
     def addPlayer(self, player):
         if not self.gameStarted:
