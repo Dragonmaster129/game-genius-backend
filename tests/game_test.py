@@ -4,6 +4,7 @@ from sampledata import data
 from src.basic import buy
 from mongoConnection import mongoClient
 import copy
+from tests import player_test
 
 
 class TestGame(game.Game):
@@ -14,8 +15,8 @@ class TestGame(game.Game):
 class TestGameplay(unittest.TestCase):
     def setUp(self) -> None:
         self.db = mongoClient.client("cashflowDB")
-        self.game = TestGame(10, [self.db["player"].find({"email": "test1@test.com"})[0],
-                                  self.db["player"].find({"email": "test2@test.com"})[0]])
+        self.game = TestGame(10, [player_test.TestPlayer(self.db["player"].find({"email": "test1@test.com"})[0]),
+                                  player_test.TestPlayer(self.db["player"].find({"email": "test2@test.com"})[0])])
 
     def test_addPlayer(self):
         self.assertNotIn(self.db["player"].find({"email": "test@test.com"})[0],
