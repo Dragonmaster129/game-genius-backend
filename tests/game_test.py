@@ -1,6 +1,6 @@
 from src.objects import game
 import unittest
-from mongoConnection import getPlayerData
+from mongoConnection import getPlayerData, resetPlayer
 from tests import player_test
 import copy
 
@@ -8,6 +8,11 @@ import copy
 class TestGame(game.Game):
     def saveData(self, collection):
         pass
+
+    def addPlayer(self, email, socket=100):
+        if not self.gameStarted:
+            resetPlayer.initializePlayerData(email)
+            self.playerList.append(player_test.TestPlayer(getPlayerData.getPlayerData(email)))
 
 
 class TestGameplay(unittest.TestCase):
@@ -73,6 +78,28 @@ class TestGameplay(unittest.TestCase):
         self.game.nextTurn()
         self.assertEqual(self.game.currentTurn, 1)
         self.assertEqual(self.game.playerList[0].returnMsg(), "SKIPPED")
+
+    def test_addBaby(self):
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 0)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["expenses"]["child"][0]["count"], 0)
+        self.game.getBaby()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 1)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["expenses"]["child"][0]["count"], 0)
+        self.game.nextTurn()
+        self.game.getBaby()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 1)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["expenses"]["child"][0]["count"], 1)
+
+    def test_babyMaxedAt3(self):
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 0)
+        self.game.getBaby()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 1)
+        self.game.getBaby()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 2)
+        self.game.getBaby()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 3)
+        self.game.getBaby()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 3)
 
 
 def suite():

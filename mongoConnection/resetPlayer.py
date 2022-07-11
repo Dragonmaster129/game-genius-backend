@@ -10,4 +10,4 @@ def initializePlayerData(email, initialData=None):
     players.update_one({"email": email}, {"$set": {"playerData": initialData}})
 
 
-initializePlayerData("test@test.com")
+# initializePlayerData("test@test.com")

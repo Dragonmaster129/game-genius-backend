@@ -1,11 +1,16 @@
-from src.basic import downsized
+from src.basic import downsized, baby, borrowLoan, buy, charity, exitRatRace, paycheck, payLoan, sell
+from mongoConnection import mongoClient, getPlayerData, resetPlayer
+from sampledata import data
+from src.objects import player
+
 
 class Game:
     def __init__(self, ID, playerList):
         self.id = ID
         self.playerList = playerList
         self.currentTurn = 0
-        self.currentAction = "STARTTURN"
+        self.currentAction = "STARTGAME"
+        self.currentCard = {}
         self.actionList = ["STARTTURN", "PAYCHECK", "OPPORTUNITY", "MARKET",
                            "DOODAD", "BABY", "CHARITY", "DOWNSIZED", "ENDTURN"]
         self.currentTarget = 0
@@ -15,8 +20,12 @@ class Game:
         self.gameStarted = True
 
     def saveData(self, collection):
-        # TODO save the data
-        pass
+        playerList = [player1.playerData["email"] for player1 in self.playerList]
+        collection.update_one({"id": self.id}, {"$set": {"playerList": playerList,
+                                                         "currentTurn": self.currentTurn,
+                                                         "currentAction": self.currentAction,
+                                                         "currentCard": self.currentCard,
+                                                         "currentTarget": self.currentTarget}})
 
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
@@ -26,13 +35,22 @@ class Game:
 
     def downsizedCurrentPlayer(self):
         downsized.downsized(self.playerList[self.currentTurn].playerData["playerData"])
+        self.updateData()
+
+    def getBaby(self):
+        baby.addBaby(self.playerList[self.currentTurn].playerData["playerData"])
+        self.updateData()
+
+    def updateData(self):
+        for playerItem in self.playerList:
+            data.updateData(playerItem.playerData["playerData"])
 
     def playerToRightSingle(self):
         self.currentTarget = (self.currentTurn - 1) % len(self.playerList)
 
     def sendMsgToAllPlayers(self, msg):
-        for player in self.playerList:
-            player.sendMsg(msg)
+        for Player in self.playerList:
+            Player.sendMsg(msg)
 
     def sendMsgToCurrentPlayer(self, msg):
         self.playerList[self.currentTurn].sendMsg(msg)
@@ -40,9 +58,10 @@ class Game:
     def sendMsgToCurrentTarget(self, msg):
         self.playerList[self.currentTarget].sendMsg(msg)
 
-    def addPlayer(self, player):
+    def addPlayer(self, email, socket):
         if not self.gameStarted:
-            self.playerList.append(player)
+            resetPlayer.initializePlayerData(email)
+            self.playerList.append(player.Player(socket, getPlayerData.getPlayerData(email)))
 
     def getPlayerList(self):
         return self.playerList
@@ -52,3 +71,12 @@ class Game:
 
     def getCurrentPlayer(self):
         return self.currentTurn
+
+
+if __name__ == "__main__":
+    game = Game(10, [player.Player(1234, getPlayerData.getPlayerData("test1@test.com")),
+                     player.Player(1235, getPlayerData.getPlayerData("test2@test.com"))])
+    # game.saveData(mongoClient.client("cashflowDB")["game"])
+    print(game.getPlayerList()[game.getCurrentPlayer()].playerData["playerData"])
+    game.getBaby()
+    print(game.getPlayerList()[game.getCurrentPlayer()].playerData["playerData"])
