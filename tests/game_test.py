@@ -26,10 +26,10 @@ class TestGameplay(unittest.TestCase):
         self.assertTrue(self.game.gameStarted)
 
     def test_addPlayer(self):
-        self.assertNotIn(getPlayerData.getPlayerData("test@test.com"),
-                         self.game.getPlayerList())
-        self.game.addPlayer(getPlayerData.getPlayerData("test@test.com"))
-        self.assertIn(getPlayerData.getPlayerData("test@test.com"), self.game.getPlayerList())
+        self.assertNotIn("test3@test.com",
+                         self.game.getEmailList())
+        self.game.addPlayer("test3@test.com")
+        self.assertIn("test3@test.com", self.game.getEmailList())
 
     def test_cannotAddPlayerIfGameStarted(self):
         self.assertNotIn(getPlayerData.getPlayerData("test@test.com"), self.game.getPlayerList())
@@ -100,6 +100,13 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 3)
         self.game.getBaby()
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["child"][0]["count"], 3)
+
+    def test_borrowLoan(self):
+        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["expenses"]["loan"], 0)
+        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["cash"], 3950)
+        self.game.borrowALoan(1000)
+        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["expenses"]["loan"], 1000)
+        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["cash"], 4950)
 
 
 def suite():

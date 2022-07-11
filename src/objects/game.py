@@ -41,6 +41,10 @@ class Game:
         baby.addBaby(self.playerList[self.currentTurn].playerData["playerData"])
         self.updateData()
 
+    def borrowALoan(self, amount):
+        borrowLoan.borrowLoan(self.playerList[self.currentTarget].playerData["playerData"], amount)
+        self.updateData()
+
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])
@@ -65,6 +69,12 @@ class Game:
 
     def getPlayerList(self):
         return self.playerList
+
+    def getEmailList(self):
+        emailList = []
+        for players in self.playerList:
+            emailList.append(players.playerData["email"])
+        return emailList
 
     def getCurrentTarget(self):
         return self.currentTarget
