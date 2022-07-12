@@ -150,6 +150,26 @@ class TestGameplay(unittest.TestCase):
         self.game.charityTurnEnd()
         self.assertEqual(0, self.game.getCurrentPlayerData()["charity"])
 
+    def test_exitRatRace(self):
+        self.assertFalse(self.game.exitRatRace())
+        self.game.buyItem({"type": "realestate", "value": 100000, "downpay": 1}, 1, True)
+        self.assertTrue(self.game.exitRatRace())
+
+    def test_paycheck(self):
+        self.assertEqual(self.game.getCurrentPlayerData()["cash"], 3950)
+        self.game.receivePaycheck()
+        self.assertEqual(self.game.getCurrentPlayerData()["cash"], 7500)
+
+    def test_payBackLoan(self):
+        self.assertEqual(self.game.getCurrentPlayerData()["cash"], 3950)
+        self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 0)
+        self.game.borrowALoan(1000)
+        self.assertEqual(self.game.getCurrentPlayerData()["cash"], 4950)
+        self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 1000)
+        self.game.payBackLoan()
+        self.assertEqual(self.game.getCurrentPlayerData()["cash"], 3950)
+        self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 0)
+
 
 def suite():
     suite = unittest.TestSuite()

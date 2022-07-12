@@ -57,6 +57,16 @@ class Game:
     def charityTurnEnd(self):
         charity.turnEnd(self.playerList[self.currentTurn].playerData["playerData"])
 
+    def exitRatRace(self):
+        self.updateData()
+        return exitRatRace.exitRace(self.playerList[self.currentTurn].playerData["playerData"])
+
+    def receivePaycheck(self):
+        paycheck.paycheck(self.playerList[self.currentTurn].playerData["playerData"])
+
+    def payBackLoan(self, amount=1000):
+        payLoan.payLoan(self.playerList[self.currentTurn].playerData["playerData"], amount)
+
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])
