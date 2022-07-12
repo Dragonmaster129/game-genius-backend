@@ -105,8 +105,50 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["expenses"]["loan"], 0)
         self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["cash"], 3950)
         self.game.borrowALoan(1000)
-        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["expenses"]["loan"], 1000)
-        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()].playerData["playerData"]["cash"], 4950)
+        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()]
+                         .playerData["playerData"]["expenses"]["loan"], 1000)
+        self.assertEqual(self.game.playerList[self.game.getCurrentTarget()]
+                         .playerData["playerData"]["cash"], 4950)
+
+    def test_buyItem(self):
+        card = {
+            "type": "realestate",
+            "name": "DUPLEX",
+            "size": 2,
+            "cost": 50000,
+            "mortgage": 42000,
+            "downpay": 8000,
+            "value": 240,
+        }
+        self.assertNotIn(card,
+                         self.game.playerList[self.game.currentTarget].playerData["playerData"]["assets"]["realestate"])
+        self.game.buyItem(card, True, 1)
+        self.assertIn(card,
+                      self.game.playerList[self.game.currentTarget].playerData["playerData"]["assets"]["realestate"])
+
+    def test_getCharity(self):
+        self.assertEqual(0, self.game.getCurrentPlayerData()["charity"])
+        self.assertEqual(3950, self.game.getCurrentPlayerData()["cash"])
+        self.game.getCharity()
+        self.assertEqual(3, self.game.getCurrentPlayerData()["charity"])
+        self.assertEqual(2630, self.game.getCurrentPlayerData()["cash"])
+
+    def test_checkCharity(self):
+        self.assertFalse(self.game.checkCharity())
+        self.game.getCharity()
+        self.assertTrue(self.game.checkCharity())
+
+    def test_charityDecrements(self):
+        self.game.getCharity()
+        self.assertEqual(3, self.game.getCurrentPlayerData()["charity"])
+        self.game.charityTurnEnd()
+        self.assertEqual(2, self.game.getCurrentPlayerData()["charity"])
+        self.game.charityTurnEnd()
+        self.assertEqual(1, self.game.getCurrentPlayerData()["charity"])
+        self.game.charityTurnEnd()
+        self.assertEqual(0, self.game.getCurrentPlayerData()["charity"])
+        self.game.charityTurnEnd()
+        self.assertEqual(0, self.game.getCurrentPlayerData()["charity"])
 
 
 def suite():

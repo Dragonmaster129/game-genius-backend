@@ -45,6 +45,18 @@ class Game:
         borrowLoan.borrowLoan(self.playerList[self.currentTarget].playerData["playerData"], amount)
         self.updateData()
 
+    def buyItem(self, card, amount, action=True):
+        buy.buy(card, self.playerList[self.currentTarget].playerData["playerData"], action, amount)
+
+    def getCharity(self):
+        charity.getCharity(self.playerList[self.currentTurn].playerData["playerData"])
+
+    def checkCharity(self):
+        return charity.checkCharity(self.playerList[self.currentTurn].playerData["playerData"])
+
+    def charityTurnEnd(self):
+        charity.turnEnd(self.playerList[self.currentTurn].playerData["playerData"])
+
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])
@@ -81,6 +93,9 @@ class Game:
 
     def getCurrentPlayer(self):
         return self.currentTurn
+
+    def getCurrentPlayerData(self):
+        return self.playerList[self.currentTurn].playerData["playerData"]
 
 
 if __name__ == "__main__":
