@@ -1,12 +1,12 @@
 from src.objects import game
 import unittest
-from mongoConnection import getPlayerData, resetPlayer
+from mongoConnection import getPlayerData, resetPlayer, mongoClient
 from tests import player_test
 import copy
 
 
 class TestGame(game.Game):
-    def saveData(self, collection):
+    def saveData(self, collection=None):
         pass
 
     def addPlayer(self, email, socket=100):
@@ -169,6 +169,45 @@ class TestGameplay(unittest.TestCase):
         self.game.payBackLoan()
         self.assertEqual(self.game.getCurrentPlayerData()["cash"], 3950)
         self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 0)
+
+    def test_forcedSaleAll(self):
+        card = {
+            "type": "stock",
+            "name": "OK4U",
+            "option": "REGULAR",
+            "costPerShare": 5,
+        }
+        cardCopy = {
+            "type": "stock",
+            "name": "OK4U",
+            "option": "REGULAR",
+            "costPerShare": 5,
+        }
+        self.game.buyItem(card, 500, True)
+        self.game.nextTurn()
+        self.game.buyItem(cardCopy, 500, True)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 1450)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["cash"], 1450)
+        self.assertIn(card, self.game.playerList[0].playerData["playerData"]["assets"]["stock"])
+        self.assertIn(cardCopy, self.game.playerList[1].playerData["playerData"]["assets"]["stock"])
+        self.game.forcedSaleAll(["stock", "OK4U"], 10)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 6450)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["cash"], 6450)
+        self.assertNotIn(card, self.game.playerList[0].playerData["playerData"]["assets"]["stock"])
+        self.assertNotIn(card, self.game.playerList[1].playerData["playerData"]["assets"]["stock"])
+
+    def test_saveData(self):
+        TheGame = game.Game(10, [player_test.TestPlayer(getPlayerData.getPlayerData("test1@test.com")),
+                                 player_test.TestPlayer(getPlayerData.getPlayerData("test2@test.com")),
+                                 player_test.TestPlayer(getPlayerData.getPlayerData("test3@test.com"))])
+        self.assertFalse(TheGame.playerList[0].saved)
+        self.assertFalse(TheGame.playerList[1].saved)
+        TheGame.saveData()
+        self.assertTrue(TheGame.playerList[0].saved)
+        self.assertTrue(TheGame.playerList[1].saved)
+        db = mongoClient.client("cashflowDB")
+        self.assertEqual(db["game"].find({"id": 10})[0]["playerList"],
+                         ["test1@test.com", "test2@test.com", "test3@test.com"])
 
 
 def suite():

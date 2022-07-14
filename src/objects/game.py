@@ -1,4 +1,5 @@
 from src.basic import downsized, baby, borrowLoan, buy, charity, exitRatRace, paycheck, payLoan, sell
+from src.markets import forcedSale, insurance, mentor, naturalDisaster, pollution, recessionTradeImproves, REUpgrade
 from mongoConnection import mongoClient, getPlayerData, resetPlayer
 from sampledata import data
 from src.objects import player
@@ -19,16 +20,20 @@ class Game:
     def startGame(self):
         self.gameStarted = True
 
-    def saveData(self, collection):
+    def saveData(self, collection=None):
+        if collection is None:
+            collection = mongoClient.client("cashflowDB")["game"]
         playerList = [player1.playerData["email"] for player1 in self.playerList]
         collection.update_one({"id": self.id}, {"$set": {"playerList": playerList,
                                                          "currentTurn": self.currentTurn,
                                                          "currentAction": self.currentAction,
                                                          "currentCard": self.currentCard,
                                                          "currentTarget": self.currentTarget}})
+        self.sendSaveEventToPlayers(collection)
 
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
+        self.currentTarget = (self.currentTarget + 1) % len(self.playerList)
         if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()
@@ -47,9 +52,11 @@ class Game:
 
     def buyItem(self, card, amount, action=True):
         buy.buy(card, self.playerList[self.currentTarget].playerData["playerData"], action, amount)
+        self.updateData()
 
     def getCharity(self):
         charity.getCharity(self.playerList[self.currentTurn].playerData["playerData"])
+        self.updateData()
 
     def checkCharity(self):
         return charity.checkCharity(self.playerList[self.currentTurn].playerData["playerData"])
@@ -63,9 +70,22 @@ class Game:
 
     def receivePaycheck(self):
         paycheck.paycheck(self.playerList[self.currentTurn].playerData["playerData"])
+        self.updateData()
 
     def payBackLoan(self, amount=1000):
         payLoan.payLoan(self.playerList[self.currentTurn].playerData["playerData"], amount)
+        self.updateData()
+
+    def sellCard(self, itemData, price, amount):
+        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
+        # itemData, data, playerAction, price, amount
+
+    def forcedSaleAll(self, cardType, price):
+        for player1 in self.playerList:
+            forcedSale.forcedSale(cardType, player1.playerData["playerData"], price)
+
+    def forcedSaleTarget(self, cardType, price):
+        forcedSale.forcedSale(cardType, self.playerList[self.currentTarget].playerData["playerData"], price)
 
     def updateData(self):
         for playerItem in self.playerList:
@@ -83,6 +103,12 @@ class Game:
 
     def sendMsgToCurrentTarget(self, msg):
         self.playerList[self.currentTarget].sendMsg(msg)
+
+    def sendSaveEventToPlayers(self, collection=None):
+        if collection is None:
+            collection = mongoClient.client("cashflowDB")["player"]
+        for players in self.playerList:
+            players.saveData(collection)
 
     def addPlayer(self, email, socket):
         if not self.gameStarted:
@@ -111,7 +137,4 @@ class Game:
 if __name__ == "__main__":
     game = Game(10, [player.Player(1234, getPlayerData.getPlayerData("test1@test.com")),
                      player.Player(1235, getPlayerData.getPlayerData("test2@test.com"))])
-    # game.saveData(mongoClient.client("cashflowDB")["game"])
-    print(game.getPlayerList()[game.getCurrentPlayer()].playerData["playerData"])
-    game.getBaby()
-    print(game.getPlayerList()[game.getCurrentPlayer()].playerData["playerData"])
+    game.saveData()
