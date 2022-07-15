@@ -121,6 +121,10 @@ class Game:
     def checkBaby(self):
         return checkBaby.checkBaby(self.playerList[self.currentTarget].playerData["playerData"])
 
+    def doodad(self, cash=None, cashflow=None, category=None):
+        doodad.doodad(self.playerList[self.currentTurn].playerData["playerData"], cash, cashflow, category)
+        self.updateData()
+
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])

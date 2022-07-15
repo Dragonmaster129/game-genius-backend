@@ -294,6 +294,14 @@ class TestGameplay(unittest.TestCase):
         self.game.getBaby()
         self.assertTrue(self.game.checkBaby())
 
+    def test_doodad(self):
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["other"], 2880)
+        self.game.doodad(None, 500, "other")
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["other"], 3380)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 3950)
+        self.game.doodad(20)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 3930)
+
 
 def suite():
     suite = unittest.TestSuite()
