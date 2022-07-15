@@ -3,6 +3,7 @@ from src.markets import forcedSale, insurance, mentor, naturalDisaster, pollutio
 from mongoConnection import mongoClient, getPlayerData, resetPlayer
 from sampledata import data
 from src.objects import player
+import copy
 
 
 class Game:
@@ -33,7 +34,7 @@ class Game:
 
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
-        self.currentTarget = (self.currentTarget + 1) % len(self.playerList)
+        self.currentTarget = copy.deepcopy(self.currentTurn)
         if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()
@@ -87,6 +88,22 @@ class Game:
     def forcedSaleTarget(self, cardType, price):
         forcedSale.forcedSale(cardType, self.playerList[self.currentTarget].playerData["playerData"], price)
 
+    def pollutionHitsPLayerToRightAll(self, payTheFiftyK=None):
+        while True:
+            self.currentTarget = (self.currentTarget + 1) % len(self.playerList)
+            try:
+                if self.playerList[self.currentTarget].playerData["playerData"]["assets"]["realestate"][0]:
+                    if not insurance.checkInsurance(self.playerList[self.currentTarget].playerData["playerData"]):
+                        if payTheFiftyK is None:
+                            self.sendMsgToCurrentTarget("Select to pay $50000 or to lose property")
+                        pollution.pollution(self.playerList[self.currentTarget].playerData["playerData"], payTheFiftyK)
+                        break
+                    elif insurance.checkInsurance(self.playerList[self.currentTarget].playerData["playerData"]):
+                        break
+            except IndexError:
+                if self.currentTarget == self.currentTurn:
+                    break
+
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])
@@ -132,6 +149,18 @@ class Game:
 
     def getCurrentPlayerData(self):
         return self.playerList[self.currentTurn].playerData["playerData"]
+
+    def loadSaveData(self, collection=None):
+        if collection is None:
+            collection = mongoClient.client("cashflowDB")["game"]
+        loadingGame = collection.find({"id": self.id})[0]
+        self.currentTarget = loadingGame["currentTarget"]
+        self.currentTurn = loadingGame["currentTurn"]
+        self.currentCard = loadingGame["currentCard"]
+        self.currentAction = loadingGame["currentAction"]
+        self.currentTarget = loadingGame["currentTarget"]
+        # self.playerList = playerList
+        # self.gameStarted = False
 
 
 if __name__ == "__main__":

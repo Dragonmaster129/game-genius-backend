@@ -10,3 +10,7 @@ class Player:
     def saveData(self, collection):
         # TODO save the data
         pass
+
+    def reassignSocket(self):
+        # TODO find out how to reassign socket
+        pass

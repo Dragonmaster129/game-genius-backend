@@ -209,6 +209,25 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(db["game"].find({"id": 10})[0]["playerList"],
                          ["test1@test.com", "test2@test.com", "test3@test.com"])
 
+    def test_pollutionHitsPlayerToRightAll(self):
+        self.game.buyItem({"type": "realestate", "name": "4PLEX", "downpay": 1, "value": 1000}, 1, True)
+        self.game.nextTurn()
+        self.game.buyItem({"type": "realestate", "name": "4PLEX", "downpay": 1, "value": 1000}, 1, True)
+        self.game.nextTurn()
+        self.assertNotEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"], [])
+        self.assertNotEqual(self.game.playerList[1].playerData["playerData"]["assets"]["realestate"], [])
+        # Hits the player to the right of the current turn
+        self.game.pollutionHitsPLayerToRightAll(False)
+        self.assertNotEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"], [])
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["assets"]["realestate"], [])
+        # Goes around the circle to hit the players but skips those without something in realestate
+        # therefore it'll hit the original player in this two player game.
+        self.game.pollutionHitsPLayerToRightAll(False)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"], [])
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["assets"]["realestate"], [])
+        # If no player has any realestate then it'll terminate when it goes all the way around
+        self.game.pollutionHitsPLayerToRightAll(False)
+
 
 def suite():
     suite = unittest.TestSuite()
