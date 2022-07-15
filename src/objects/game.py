@@ -1,5 +1,6 @@
 from src.basic import downsized, baby, borrowLoan, buy, charity, exitRatRace, paycheck, payLoan, sell
 from src.markets import forcedSale, insurance, mentor, naturalDisaster, pollution, recessionTradeImproves, REUpgrade
+from src import checkBaby, doodad, resetKeyValues
 from mongoConnection import mongoClient, getPlayerData, resetPlayer
 from sampledata import data
 from src.objects import player
@@ -116,6 +117,9 @@ class Game:
     def REUpgrade(self, changeTo, requiredType, changing=None):
         REUpgrade.upgrade(changeTo, self.playerList[self.currentTarget].playerData["playerData"],
                           requiredType, changing)
+
+    def checkBaby(self):
+        return checkBaby.checkBaby(self.playerList[self.currentTarget].playerData["playerData"])
 
     def updateData(self):
         for playerItem in self.playerList:

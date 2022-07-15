@@ -287,6 +287,13 @@ class TestGameplay(unittest.TestCase):
         self.game.REUpgrade(newCard, "4-PLEX")
         self.assertIn(newCard, self.game.playerList[0].playerData["playerData"]["assets"]["realestate"])
 
+    def test_checkBaby(self):
+        self.assertFalse(self.game.checkBaby())
+        self.game.nextTurn()
+        self.assertFalse(self.game.checkBaby())
+        self.game.getBaby()
+        self.assertTrue(self.game.checkBaby())
+
 
 def suite():
     suite = unittest.TestSuite()
