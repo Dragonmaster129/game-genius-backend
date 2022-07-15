@@ -302,6 +302,20 @@ class TestGameplay(unittest.TestCase):
         self.game.doodad(20)
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 3930)
 
+    def test_resetKeyValues(self):
+        self.game.playerList[0].playerData["playerData"]["assets"]["realestate"].append({
+                "name": "4-PLEX",
+                "size": 4,
+                "cost": 55000,
+                "mortgage": 48000,
+                "downpay": 7000,
+                "value": 400,
+                "key": 3,
+            })
+        self.assertNotEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["key"], 1)
+        self.game.updateData()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["key"], 1)
+
 
 def suite():
     suite = unittest.TestSuite()

@@ -128,6 +128,9 @@ class Game:
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])
+            for category in playerItem.playerData["playerData"]["assets"]:
+                if isinstance(playerItem.playerData["playerData"]["assets"][category], list):
+                    resetKeyValues.resetKeyValues(playerItem.playerData["playerData"]["assets"][category])
         self.resetTarget()
 
     def playerToRightSingle(self):
