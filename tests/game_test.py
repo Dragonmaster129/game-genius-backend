@@ -275,6 +275,18 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["passive"], 560)
         self.assertEqual(self.game.playerList[1].playerData["playerData"]["passive"], 320)
 
+    def test_REUpgrade(self):
+        card = {"type": "realestate", "name": "4-PLEX", "downpay": 0, "value": 300, "mortgage": 150000, "cost": 150000}
+        newCard = {"name": "8-PLEX", "downpay": 40000, "value": 1700, "mortgage": 150000, "cost": 190000}
+        self.game.buyItem(card, 1, True)
+        self.assertIn(card, self.game.playerList[0].playerData["playerData"]["assets"]["realestate"])
+        # Doesn't have the right item to upgrade so it'll fail
+        self.game.REUpgrade(newCard, "DUPLEX")
+        self.assertIn(card, self.game.playerList[0].playerData["playerData"]["assets"]["realestate"])
+        # Has an item that will upgrade so it should upgrade
+        self.game.REUpgrade(newCard, "4-PLEX")
+        self.assertIn(newCard, self.game.playerList[0].playerData["playerData"]["assets"]["realestate"])
+
 
 def suite():
     suite = unittest.TestSuite()

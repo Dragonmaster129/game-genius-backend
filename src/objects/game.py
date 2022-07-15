@@ -113,6 +113,10 @@ class Game:
             recessionTradeImproves.recessionTradeImproves(players.playerData["playerData"], amount)
         self.updateData()
 
+    def REUpgrade(self, changeTo, requiredType, changing=None):
+        REUpgrade.upgrade(changeTo, self.playerList[self.currentTarget].playerData["playerData"],
+                          requiredType, changing)
+
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])

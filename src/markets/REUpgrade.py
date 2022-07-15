@@ -4,9 +4,13 @@ from src import resetKeyValues
 def upgrade(change, data, requiredType, changing=None):
     changingIsRequiredType = False
     if changing is None:
+        iteration = 0
         for i in data["assets"]["realestate"]:
+            iteration += 1
             if i["name"] == requiredType:
                 changingIsRequiredType = True
+                changing = iteration
+                break
     else:
         changingIsRequiredType = data["assets"]["realestate"][changing-1]["name"] == requiredType
     if changingIsRequiredType and change is None:
