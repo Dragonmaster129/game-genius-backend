@@ -39,6 +39,9 @@ class Game:
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()
 
+    def resetTarget(self):
+        self.currentTarget = copy.deepcopy(self.currentTurn)
+
     def downsizedCurrentPlayer(self):
         downsized.downsized(self.playerList[self.currentTurn].playerData["playerData"])
         self.updateData()
@@ -103,10 +106,17 @@ class Game:
             except IndexError:
                 if self.currentTarget == self.currentTurn:
                     break
+        self.updateData()
+
+    def recessionTradeImproves(self, amount=30):
+        for players in self.playerList:
+            recessionTradeImproves.recessionTradeImproves(players.playerData["playerData"], amount)
+        self.updateData()
 
     def updateData(self):
         for playerItem in self.playerList:
             data.updateData(playerItem.playerData["playerData"])
+        self.resetTarget()
 
     def playerToRightSingle(self):
         self.currentTarget = (self.currentTurn - 1) % len(self.playerList)

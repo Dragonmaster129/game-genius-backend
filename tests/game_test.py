@@ -216,6 +216,12 @@ class TestGameplay(unittest.TestCase):
         self.game.nextTurn()
         self.assertNotEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"], [])
         self.assertNotEqual(self.game.playerList[1].playerData["playerData"]["assets"]["realestate"], [])
+        # Hits the player but the player pays the 50K to keep property
+        self.game.playerList[1].playerData["playerData"]["cash"] += 1
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["cash"], 3950)
+        self.game.pollutionHitsPLayerToRightAll(True)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["cash"], 950)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["expenses"]["loan"], 47000)
         # Hits the player to the right of the current turn
         self.game.pollutionHitsPLayerToRightAll(False)
         self.assertNotEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"], [])
@@ -227,6 +233,47 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(self.game.playerList[1].playerData["playerData"]["assets"]["realestate"], [])
         # If no player has any realestate then it'll terminate when it goes all the way around
         self.game.pollutionHitsPLayerToRightAll(False)
+
+    def test_recessionTradeImproves(self):
+        card = {
+            "type": "realestate",
+            "name": "STARTERHOUSE",
+            "size": 1,
+            "cost": 55000,
+            "mortgage": 50000,
+            "downpay": 5000,
+            "value": 200,
+        }
+        card2 = {
+            "type": "realestate",
+            "name": "STARTERHOUSE",
+            "size": 1,
+            "cost": 55000,
+            "mortgage": 48000,
+            "downpay": 7000,
+            "value": 400,
+        }
+        card3 = {
+            "type": "realestate",
+            "name": "4-PLEX",
+            "size": 4,
+            "cost": 55000,
+            "mortgage": 48000,
+            "downpay": 7000,
+            "value": 400,
+        }
+        self.game.buyItem(card, 1, True)
+        self.game.buyItem(card2, 1, True)
+        self.game.nextTurn()
+        self.game.buyItem(card3, 1, True)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["passive"], 600)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["passive"], 400)
+        self.game.recessionTradeImproves(-50)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["passive"], 500)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["passive"], 200)
+        self.game.recessionTradeImproves(30)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["passive"], 560)
+        self.assertEqual(self.game.playerList[1].playerData["playerData"]["passive"], 320)
 
 
 def suite():
