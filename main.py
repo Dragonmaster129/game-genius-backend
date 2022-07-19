@@ -58,6 +58,15 @@ temp = temps.find({})
 for i in temp:
     professions.append(i["profession"])
 
+# beginning
+# capitalgain
+# cashflow
+# doodad
+# game
+# initialData
+# markets
+# player
+
 
 @app.get("/data/{tokenID}")
 async def getData(tokenID):
@@ -91,6 +100,6 @@ async def reset(tokenID):
 @app.post("/card/add/doodad")
 async def addCardData(cardData: DoodadCard):
     if cardData.token in authTokens:
-        createCard.createCard(cardData)
+        createCard.createCard(cardData, "doodad")
         return True
     return False
