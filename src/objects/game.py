@@ -14,23 +14,59 @@ class Game:
         self.currentTurn = 0
         self.currentAction = "STARTGAME"
         self.currentCard = {}
-        self.actionList = ["STARTTURN", "PAYCHECK", "OPPORTUNITY", "MARKET",
+        self.actionList = ["STARTTURN", "PAYCHECK", "CASHFLOW", "CAPITALGAIN", "MARKETS",
                            "DOODAD", "BABY", "CHARITY", "DOWNSIZED", "ENDTURN"]
         self.currentTarget = 0
+        self.doodadOrder = []
+        self.marketOrder = []
+        self.capitalOrder = []
+        self.cashflowOrder = []
+        self.beginningOrder = []
         self.gameStarted = False
 
     def startGame(self):
+        db = mongoClient.client("cashflowDB")
+        Doodad = db["doodad"]
+        tmpList = Doodad.find({}, {"_id": 0, "ID": True})
+        List = []
+        iteration = 0
+        while True:
+            try:
+                List.append(tmpList[iteration]["ID"])
+                iteration += 1
+            except:
+                break
+        self.doodadOrder = List
+        print(self.doodadOrder)
+        Market = db["market"]
+        Capital = db["capitalgain"]
+        Cashflow = db["cashflow"]
+        Beginning = db["beginning"]
         self.gameStarted = True
+
+    def drawCard(self):
+        db = mongoClient.client("cashflowDB")[self.currentAction.lower()]
+        nextCard = ""
+        if self.currentAction == "DOODAD":
+            nextCard = self.doodadOrder.pop(0)
+        self.currentCard = db.find({"ID": nextCard})[0]
 
     def saveData(self, collection=None):
         if collection is None:
             collection = mongoClient.client("cashflowDB")["game"]
         playerList = [player1.playerData["email"] for player1 in self.playerList]
-        collection.update_one({"id": self.id}, {"$set": {"playerList": playerList,
-                                                         "currentTurn": self.currentTurn,
-                                                         "currentAction": self.currentAction,
-                                                         "currentCard": self.currentCard,
-                                                         "currentTarget": self.currentTarget}})
+        collection.update_one({"id": self.id}, {"$set": {
+            "playerList": playerList,
+            "currentTurn": self.currentTurn,
+            "currentAction": self.currentAction,
+            "currentCard": self.currentCard,
+            "currentTarget": self.currentTarget,
+            "doodadOrder": self.doodadOrder,
+            "marketOrder": self.marketOrder,
+            "capitalOrder": self.capitalOrder,
+            "cashflowOrder": self.cashflowOrder,
+            "beginningOrder": self.beginningOrder
+        }})
         self.sendSaveEventToPlayers()
 
     def nextTurn(self):
@@ -82,7 +118,8 @@ class Game:
         self.updateData()
 
     def sellCard(self, itemData, price, amount, sellType):
-        if self.playerList[self.currentTarget].playerData["playerData"][itemData[0]][itemData[1]][itemData[2]-1]["name"] == sellType:
+        if (self.playerList[self.currentTarget]
+                .playerData["playerData"][itemData[0]][itemData[1]][itemData[2]-1]["name"]) == sellType:
             sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
         # itemData, data, playerAction, price, amount
 
@@ -92,6 +129,13 @@ class Game:
 
     def forcedSaleTarget(self, cardType, price):
         forcedSale.forcedSale(cardType, self.playerList[self.currentTarget].playerData["playerData"], price)
+
+    def getMentor(self):
+        mentor.mentor(self.playerList[self.currentTurn].playerData["playerData"])
+
+    def mentorAction(self):
+        mentor.decrementMentor(self.playerList[self.currentTurn].playerData["playerData"])
+        self.drawCard()
 
     def getInsurance(self, monthlyCost):
         if self.playerList[self.currentTurn].playerData["playerData"]["expenses"]["insurance"] == 0:
@@ -189,6 +233,11 @@ class Game:
         self.currentCard = loadingGame["currentCard"]
         self.currentAction = loadingGame["currentAction"]
         self.currentTarget = loadingGame["currentTarget"]
+        self.doodadOrder = loadingGame["doodadOrder"]
+        self.marketOrder = loadingGame["marketOrder"]
+        self.capitalOrder = loadingGame["capitalOrder"]
+        self.cashflowOrder = loadingGame["cashflowOrder"]
+        self.beginningOrder = loadingGame["beginningOrder"]
         # self.playerList = playerList
         # self.gameStarted = False
 
@@ -196,4 +245,5 @@ class Game:
 if __name__ == "__main__":
     game = Game(10, [player.Player(1234, getPlayerData.getPlayerData("test1@test.com")),
                      player.Player(1235, getPlayerData.getPlayerData("test2@test.com"))])
-    game.saveData()
+    game.startGame()
+    # game.saveData()

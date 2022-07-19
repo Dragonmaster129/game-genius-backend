@@ -5,12 +5,13 @@ import uuid
 def createCard(cardData, collection):
     db = mongoClient.client("cashflowDB")[collection]
     ID = uuid.uuid4().hex
-    db.insert_one({"ID": ID})
-    for i in cardData.keys():
-        print(i)
-        print(cardData[i])
-        db.update_one({"ID": ID}, {"$set": {i: cardData[i]}})
-    print(cardData)
+    try:
+        if db.find({"ID": ID})[0]:
+            createCard(cardData, collection)
+    except IndexError:
+        db.insert_one({"ID": ID})
+        for i in cardData.keys():
+            db.update_one({"ID": ID}, {"$set": {i: cardData[i]}})
 
 
 if __name__ == "__main__":
