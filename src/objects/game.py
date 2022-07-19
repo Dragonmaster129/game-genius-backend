@@ -31,7 +31,7 @@ class Game:
                                                          "currentAction": self.currentAction,
                                                          "currentCard": self.currentCard,
                                                          "currentTarget": self.currentTarget}})
-        self.sendSaveEventToPlayers(collection)
+        self.sendSaveEventToPlayers()
 
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)

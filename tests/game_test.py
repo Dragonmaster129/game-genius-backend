@@ -1,4 +1,4 @@
-from src.objects import game
+from src.objects import game, player
 import unittest
 from mongoConnection import getPlayerData, resetPlayer, mongoClient
 from tests import player_test
@@ -208,6 +208,26 @@ class TestGameplay(unittest.TestCase):
         db = mongoClient.client("cashflowDB")
         self.assertEqual(db["game"].find({"id": 10})[0]["playerList"],
                          ["test1@test.com", "test2@test.com", "test3@test.com"])
+
+    def test_savePlayerData(self):
+        TheGame = game.Game(10, [player.Player(1234, getPlayerData.getPlayerData("test4@test.com")),
+                                 player.Player(213, getPlayerData.getPlayerData("test5@test.com")),
+                                 player.Player(312, getPlayerData.getPlayerData("test6@test.com"))])
+        TheGame.getBaby()
+        TheGame.nextTurn()
+        TheGame.getCharity()
+        TheGame.nextTurn()
+        TheGame.downsizedCurrentPlayer()
+        TheGame.saveData()
+        db = mongoClient.client("cashflowDB")
+        self.assertEqual(db["game"].find({"id": 10})[0]["playerList"],
+                         ["test4@test.com", "test5@test.com", "test6@test.com"])
+        self.assertEqual(
+            db["player"].find({"email": "test4@test.com"})[0]["playerData"]["expenses"]["child"][0]["count"],
+            1
+        )
+        self.assertEqual(db["player"].find({"email": "test5@test.com"})[0]["playerData"]["charity"], 3)
+        self.assertEqual(db["player"].find({"email": "test6@test.com"})[0]["playerData"]["downsized"], 2)
 
     def test_pollutionHitsPlayerToRightAll(self):
         self.game.buyItem({"type": "realestate", "name": "4PLEX", "downpay": 1, "value": 1000}, 1, True)

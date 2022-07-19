@@ -7,6 +7,7 @@ def getPlayerData(email):
         playerData = db["player"].find({"email": email})[0]
         playerData.pop("_id")
         playerData.pop("pwd")
+        playerData["playerData"]
         return playerData
     except KeyError:
         resetPlayer.initializePlayerData(email)
