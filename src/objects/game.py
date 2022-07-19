@@ -81,8 +81,9 @@ class Game:
         payLoan.payLoan(self.playerList[self.currentTurn].playerData["playerData"], amount)
         self.updateData()
 
-    def sellCard(self, itemData, price, amount):
-        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
+    def sellCard(self, itemData, price, amount, sellType):
+        if self.playerList[self.currentTarget].playerData["playerData"][itemData[0]][itemData[1]][itemData[2]-1]["name"] == sellType:
+            sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
         # itemData, data, playerAction, price, amount
 
     def forcedSaleAll(self, cardType, price):

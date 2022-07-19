@@ -170,6 +170,23 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(self.game.getCurrentPlayerData()["cash"], 3950)
         self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 0)
 
+    def test_sell(self):
+        card = {
+            "type": "realestate",
+            "name": "STARTERHOUSE",
+            "size": 1,
+            "cost": 46000,
+            "mortgage": 40000,
+            "downpay": 6000,
+            "value": 20,
+        }
+        self.game.buyItem(card, 10)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 950)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["loan"], 3000)
+        self.game.sellCard(["assets", "realestate", 1], 85000, 1, "STARTERHOUSE")
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 45950)
+        self.assertNotIn(card, self.game.playerList[0].playerData["playerData"]["assets"]["realestate"])
+
     def test_forcedSaleAll(self):
         card = {
             "type": "stock",
@@ -210,6 +227,9 @@ class TestGameplay(unittest.TestCase):
                          ["test1@test.com", "test2@test.com", "test3@test.com"])
 
     def test_savePlayerData(self):
+        resetPlayer.initializePlayerData("test4@test.com")
+        resetPlayer.initializePlayerData("test5@test.com")
+        resetPlayer.initializePlayerData("test6@test.com")
         TheGame = game.Game(10, [player.Player(1234, getPlayerData.getPlayerData("test4@test.com")),
                                  player.Player(213, getPlayerData.getPlayerData("test5@test.com")),
                                  player.Player(312, getPlayerData.getPlayerData("test6@test.com"))])
