@@ -93,6 +93,10 @@ class Game:
     def forcedSaleTarget(self, cardType, price):
         forcedSale.forcedSale(cardType, self.playerList[self.currentTarget].playerData["playerData"], price)
 
+    def getInsurance(self, monthlyCost):
+        if self.playerList[self.currentTurn].playerData["playerData"]["expenses"]["insurance"] == 0:
+            insurance.getInsurance(self.playerList[self.currentTurn].playerData["playerData"], monthlyCost)
+
     def pollutionHitsPLayerToRightAll(self, payTheFiftyK=None):
         while True:
             self.currentTarget = (self.currentTarget + 1) % len(self.playerList)

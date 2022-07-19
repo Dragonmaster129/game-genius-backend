@@ -356,6 +356,11 @@ class TestGameplay(unittest.TestCase):
         self.game.updateData()
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["key"], 1)
 
+    def test_getInsurance(self):
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["insurance"], 0)
+        self.game.getInsurance(200)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["insurance"], 200)
+
 
 def suite():
     suite = unittest.TestSuite()
