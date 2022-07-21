@@ -421,6 +421,44 @@ class TestGameplay(unittest.TestCase):
         self.game.mentorAction()
         self.assertNotEqual(cardCopy, self.game.currentCard)
 
+    def test_checkInsurance(self):
+        self.assertFalse(self.game.checkInsurance())
+        self.game.getInsurance(200)
+        self.assertTrue(self.game.checkInsurance())
+
+    def test_naturalDisaster(self):
+        card = {
+            "type": "realestate",
+            "name": "STARTERHOUSE",
+            "size": 1,
+            "cost": 46000,
+            "mortgage": 40000,
+            "downpay": 6000,
+            "value": 20,
+        }
+        self.game.buyItem(card, 1)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["value"], 20)
+        self.game.naturalDisaster()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["value"], 0)
+
+    def test_naturalDisasterInsured(self):
+        card = {
+            "type": "realestate",
+            "name": "STARTERHOUSE",
+            "size": 1,
+            "cost": 46000,
+            "mortgage": 40000,
+            "downpay": 6000,
+            "value": 20,
+        }
+        self.game.playerList[0].playerData["playerData"]["cash"] = 6950
+        self.game.buyItem(card, 1)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["value"], 20)
+        self.game.getInsurance(200)
+        self.game.naturalDisaster()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["assets"]["realestate"][0]["value"], 0)
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 6950)
+
 
 
 

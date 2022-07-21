@@ -93,7 +93,6 @@ class Game:
             self.drawCard()
             self.nextTurn()
 
-
     def changeAction(self, action):
         if action in self.actionList or action == "BEGINNING":
             self.currentAction = action
@@ -242,6 +241,9 @@ class Game:
         if self.playerList[self.currentTurn].playerData["playerData"]["expenses"]["insurance"] == 0:
             insurance.getInsurance(self.playerList[self.currentTurn].playerData["playerData"], monthlyCost)
 
+    def checkInsurance(self):
+        return insurance.checkInsurance(self.playerList[self.currentTarget].playerData["playerData"])
+
     def pollutionHitsPLayerToRightAll(self, payTheFiftyK=None):
         while True:
             self.currentTarget = (self.currentTarget + 1) % len(self.playerList)
@@ -274,6 +276,9 @@ class Game:
     def doodad(self, cash=None, cashflow=None, category=None):
         doodad.doodad(self.playerList[self.currentTurn].playerData["playerData"], cash, cashflow, category)
         self.updateData()
+
+    def naturalDisaster(self):
+        naturalDisaster.disaster(self.playerList[self.currentTarget].playerData["playerData"], self.checkInsurance())
 
     def updateData(self):
         for playerItem in self.playerList:

@@ -1,4 +1,4 @@
-def disaster(data):
+def disaster(data, insured=False):
     # Find the highest item in realEstate and land
     # highest is a list for three items, the first being the category eg. realestate
     # the second being the index, and the third being the item's value
@@ -14,6 +14,8 @@ def disaster(data):
                 except IndexError:
                     highest = [i, iteration, item["value"]]
                     iteration += 1
+    if insured:
+        data["cash"] += data["assets"][highest[0]][highest[1]]["downpay"]
     if highest[0] != "land":
         data["assets"][highest[0]][highest[1]]["value"] = 0
     data["assets"][highest[0]][highest[1]]["disaster"] = True
