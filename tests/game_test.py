@@ -410,6 +410,17 @@ class TestGameplay(unittest.TestCase):
         self.game.drawCard()
         self.assertNotEqual(self.game.cashflowOrder, [])
 
+    def test_mentor(self):
+        self.game.startGame()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["mentor"], 0)
+        self.game.getMentor()
+        self.assertEqual(self.game.playerList[0].playerData["playerData"]["mentor"], 3)
+        self.game.currentAction = "CAPITALGAIN"
+        self.game.drawCard()
+        cardCopy = copy.deepcopy(self.game.currentCard)
+        self.game.mentorAction()
+        self.assertNotEqual(cardCopy, self.game.currentCard)
+
 
 
 

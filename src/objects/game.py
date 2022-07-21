@@ -88,6 +88,15 @@ class Game:
         random.shuffle(List)
         self.beginningOrder = copy.deepcopy(List)
         self.gameStarted = True
+        self.changeAction("BEGINNING")
+        for i in self.playerList:
+            self.drawCard()
+            self.nextTurn()
+
+
+    def changeAction(self, action):
+        if action in self.actionList or action == "BEGINNING":
+            self.currentAction = action
 
     def fillCardDraws(self):
         search = mongoClient.client("cashflowDB")[self.currentAction.lower()]
@@ -137,6 +146,11 @@ class Game:
                 if not self.beginningOrder:
                     self.fillCardDraws()
             self.currentCard = db.find({"ID": nextCard})[0]
+            self.actOnCard()
+
+    def actOnCard(self):
+        if self.currentAction == "BEGINNING":
+            self.playerList[self.currentTurn].addBeginningCard(self.currentCard)
 
     def saveData(self, collection=None):
         if collection is None:

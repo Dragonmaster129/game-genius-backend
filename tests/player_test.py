@@ -11,7 +11,7 @@ class TestPlayer(player.Player):
         self.message = message
         self.saved = False
 
-    def saveData(self, collection):
+    def saveData(self, collection=None):
         self.saved = True
 
     def returnMsg(self):
