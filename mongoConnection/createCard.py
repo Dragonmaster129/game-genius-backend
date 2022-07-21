@@ -15,4 +15,5 @@ def createCard(cardData, collection):
 
 
 if __name__ == "__main__":
-    createCard({"description": "YOU CAN'T SAY NO!", "cash": 20, "cashflow": 200, "category": "other"}, "doodad")
+    # createCard({"description": "Description 50", "cash": 20, "cashflow": 200, "category": "other"}, "doodad")
+    createCard({"description": "Words that make the capital", "deleteThis": 1}, "cashflow")

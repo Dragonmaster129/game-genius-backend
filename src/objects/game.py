@@ -5,6 +5,7 @@ from mongoConnection import mongoClient, getPlayerData, resetPlayer
 from sampledata import data
 from src.objects import player
 import copy
+import random
 
 
 class Game:
@@ -14,7 +15,7 @@ class Game:
         self.currentTurn = 0
         self.currentAction = "STARTGAME"
         self.currentCard = {}
-        self.actionList = ["STARTTURN", "PAYCHECK", "CASHFLOW", "CAPITALGAIN", "MARKETS",
+        self.actionList = ["STARTTURN", "PAYCHECK", "CASHFLOW", "CAPITALGAIN", "MARKET",
                            "DOODAD", "BABY", "CHARITY", "DOWNSIZED", "ENDTURN"]
         self.currentTarget = 0
         self.doodadOrder = []
@@ -34,22 +35,108 @@ class Game:
             try:
                 List.append(tmpList[iteration]["ID"])
                 iteration += 1
-            except:
+            except IndexError:
                 break
-        self.doodadOrder = List
-        print(self.doodadOrder)
+        random.shuffle(List)
+        self.doodadOrder = copy.deepcopy(List)
         Market = db["market"]
+        tmpList = Market.find({}, {"_id": 0, "ID": True})
+        List = []
+        iteration = 0
+        while True:
+            try:
+                List.append(tmpList[iteration]["ID"])
+                iteration += 1
+            except IndexError:
+                break
+        random.shuffle(List)
+        self.marketOrder = copy.deepcopy(List)
         Capital = db["capitalgain"]
+        tmpList = Capital.find({}, {"_id": 0, "ID": True})
+        List = []
+        iteration = 0
+        while True:
+            try:
+                List.append(tmpList[iteration]["ID"])
+                iteration += 1
+            except IndexError:
+                break
+        random.shuffle(List)
+        self.capitalOrder = copy.deepcopy(List)
         Cashflow = db["cashflow"]
+        tmpList = Cashflow.find({}, {"_id": 0, "ID": True})
+        List = []
+        iteration = 0
+        while True:
+            try:
+                List.append(tmpList[iteration]["ID"])
+                iteration += 1
+            except IndexError:
+                break
+        random.shuffle(List)
+        self.cashflowOrder = copy.deepcopy(List)
         Beginning = db["beginning"]
+        tmpList = Beginning.find({}, {"_id": 0, "ID": True})
+        List = []
+        iteration = 0
+        while True:
+            try:
+                List.append(tmpList[iteration]["ID"])
+                iteration += 1
+            except IndexError:
+                break
+        random.shuffle(List)
+        self.beginningOrder = copy.deepcopy(List)
         self.gameStarted = True
 
-    def drawCard(self):
-        db = mongoClient.client("cashflowDB")[self.currentAction.lower()]
-        nextCard = ""
+    def fillCardDraws(self):
+        search = mongoClient.client("cashflowDB")[self.currentAction.lower()]
+        tmpList = search.find({}, {"_id": 0, "ID": True})
+        List = []
+        iteration = 0
+        while True:
+            try:
+                List.append(tmpList[iteration]["ID"])
+                iteration += 1
+            except IndexError:
+                break
+        random.shuffle(List)
         if self.currentAction == "DOODAD":
-            nextCard = self.doodadOrder.pop(0)
-        self.currentCard = db.find({"ID": nextCard})[0]
+            self.doodadOrder = copy.deepcopy(List)
+        elif self.currentAction == "CASHFLOW":
+            self.cashflowOrder = copy.deepcopy(List)
+        elif self.currentAction == "CAPITALGAIN":
+            self.capitalOrder = copy.deepcopy(List)
+        elif self.currentAction == "MARKET":
+            self.marketOrder = copy.deepcopy(List)
+        elif self.currentAction == "BEGINNING":
+            self.beginningOrder = copy.deepcopy(List)
+
+    def drawCard(self):
+        if self.currentAction not in ["STARTTURN", "PAYCHECK", "BABY", "CHARITY", "DOWNSIZED", "ENDTURN"]:
+            db = mongoClient.client("cashflowDB")[self.currentAction.lower()]
+            nextCard = ""
+            if self.currentAction == "DOODAD":
+                nextCard = self.doodadOrder.pop(0)
+                if not self.doodadOrder:
+                    self.fillCardDraws()
+            elif self.currentAction == "CASHFLOW":
+                nextCard = self.cashflowOrder.pop(0)
+                if not self.cashflowOrder:
+                    self.fillCardDraws()
+            elif self.currentAction == "CAPITALGAIN":
+                nextCard = self.capitalOrder.pop(0)
+                if not self.capitalOrder:
+                    self.fillCardDraws()
+            elif self.currentAction == "MARKET":
+                nextCard = self.marketOrder.pop(0)
+                if not self.marketOrder:
+                    self.fillCardDraws()
+            elif self.currentAction == "BEGINNING":
+                nextCard = self.beginningOrder.pop(0)
+                if not self.beginningOrder:
+                    self.fillCardDraws()
+            self.currentCard = db.find({"ID": nextCard})[0]
 
     def saveData(self, collection=None):
         if collection is None:
@@ -246,4 +333,4 @@ if __name__ == "__main__":
     game = Game(10, [player.Player(1234, getPlayerData.getPlayerData("test1@test.com")),
                      player.Player(1235, getPlayerData.getPlayerData("test2@test.com"))])
     game.startGame()
-    # game.saveData()
+    game.saveData()

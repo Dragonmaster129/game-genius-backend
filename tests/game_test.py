@@ -361,6 +361,57 @@ class TestGameplay(unittest.TestCase):
         self.game.getInsurance(200)
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["insurance"], 200)
 
+    def test_drawCardDoodad(self):
+        self.assertEqual(self.game.currentCard, {})
+        self.game.startGame()
+        self.game.currentAction = "DOODAD"
+        self.game.drawCard()
+        self.assertNotEqual(self.game.currentCard, {})
+
+    def test_drawCardMarket(self):
+        self.assertEqual(self.game.currentCard, {})
+        self.game.startGame()
+        self.game.currentAction = "MARKET"
+        self.game.drawCard()
+        self.assertNotEqual(self.game.currentCard, {})
+
+    def test_drawCardBeginning(self):
+        self.assertEqual(self.game.currentCard, {})
+        self.game.startGame()
+        self.game.currentAction = "BEGINNING"
+        self.game.drawCard()
+        self.assertNotEqual(self.game.currentCard, {})
+
+    def test_drawCardCapital(self):
+        self.assertEqual(self.game.currentCard, {})
+        self.game.startGame()
+        self.game.currentAction = "CAPITALGAIN"
+        self.game.drawCard()
+        self.assertNotEqual(self.game.currentCard, {})
+
+    def test_drawCardCashflow(self):
+        self.assertEqual(self.game.currentCard, {})
+        self.game.startGame()
+        self.game.currentAction = "CASHFLOW"
+        self.game.drawCard()
+        self.assertNotEqual(self.game.currentCard, {})
+
+    def test_drawCardResetList(self):
+        self.assertEqual(self.game.currentCard, {})
+        self.game.startGame()
+        self.game.currentAction = "CAPITALGAIN"
+        Onecard = self.game.capitalOrder.pop(0)
+        self.game.capitalOrder = [copy.deepcopy(Onecard)]
+        self.game.drawCard()
+        self.assertNotEqual(self.game.capitalOrder, [])
+        self.game.currentAction = "CASHFLOW"
+        Onecard = self.game.cashflowOrder.pop(0)
+        self.game.cashflowOrder = [copy.deepcopy(Onecard)]
+        self.game.drawCard()
+        self.assertNotEqual(self.game.cashflowOrder, [])
+
+
+
 
 def suite():
     suite = unittest.TestSuite()
