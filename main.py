@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import uuid
@@ -34,6 +34,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+db = mongoClient.client("cashflowDB")
+
 
 class LoginData(BaseModel):
     email: str
@@ -53,7 +55,7 @@ class DoodadCard(BaseModel):
 tokens = {"1": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 professions = []
-temps = mongoClient.client("cashflowDB")["initialData"]
+temps = db["initialData"]
 temp = temps.find({})
 for i in temp:
     professions.append(i["profession"])
@@ -72,7 +74,12 @@ for i in temp:
 async def getData(tokenID):
     if tokenID in tokens:
         return json_util.dumps(getPlayerData.getPlayerData(tokens[tokenID]))
-    return json.dumps("invalid token")
+    return "invalid token"
+
+
+@app.get("/games")
+async def getGames():
+    gameList = db["game"].find({"gameStarted": 0})
 
 
 @app.post("/login")
@@ -103,3 +110,11 @@ async def addCardData(cardData: DoodadCard):
         createCard.createCard(cardData, "doodad")
         return True
     return False
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        res = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {res}")

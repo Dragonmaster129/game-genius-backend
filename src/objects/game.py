@@ -165,7 +165,8 @@ class Game:
             "marketOrder": self.marketOrder,
             "capitalOrder": self.capitalOrder,
             "cashflowOrder": self.cashflowOrder,
-            "beginningOrder": self.beginningOrder
+            "beginningOrder": self.beginningOrder,
+            "gameStarted": self.gameStarted
         }})
         self.sendSaveEventToPlayers()
 
