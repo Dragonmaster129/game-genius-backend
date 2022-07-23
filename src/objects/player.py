@@ -9,6 +9,7 @@ class Player:
 
     def sendMsg(self, message):
         # TODO figure out how to send the message
+        # send the message through the socket
         pass
 
     def saveData(self, collection=None):

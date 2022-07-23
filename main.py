@@ -10,6 +10,7 @@ import time
 from sampledata import data
 from pydantic import BaseModel
 from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard
+from src.objects import game
 # from src import totalUp
 
 # App initialization
@@ -54,6 +55,7 @@ class DoodadCard(BaseModel):
 
 tokens = {"1": "test@test.com"}
 authTokens = {"1": "test@test.com"}
+websockets = {}
 professions = []
 temps = db["initialData"]
 temp = temps.find({})
@@ -80,6 +82,19 @@ async def getData(tokenID):
 @app.get("/games")
 async def getGames():
     gameList = db["game"].find({"gameStarted": 0})
+    # TODO sort through the data and return a list
+
+
+@app.post("/create-game")
+async def createGame():
+    # TODO get the data and create the game
+    pass
+
+
+@app.delete("/end-game")
+async def deleteGame():
+    # TODO when the game is over/no players been in for a long time, delete the game
+    pass
 
 
 @app.post("/login")
@@ -112,9 +127,17 @@ async def addCardData(cardData: DoodadCard):
     return False
 
 
-@app.websocket("/ws")
+@app.get("/activateEvent")
+async def activateEvent():
+    for i in websockets.keys():
+        await websockets[i].send_text("SENT")
+
+
+@app.websocket("/joinGame")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         res = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {res}")
+        # await websocket.send_text(f"Message text was: {res}")
+        # print(res)
+        websockets[tokens[res[0]]] = websocket
