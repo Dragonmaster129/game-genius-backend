@@ -1,5 +1,6 @@
 from mongoConnection import getPlayerData, mongoClient
 import json
+import asyncio
 
 
 class Player:
@@ -15,7 +16,7 @@ class Player:
             message.pop("_id")
         except KeyError:
             pass
-        self.socket.send_text(json.dumps(message))
+        asyncio.create_task(self.socket.send_text(json.dumps(message)))
 
     def saveData(self, collection=None):
         if collection is None:

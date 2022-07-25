@@ -6,7 +6,6 @@ from bson import json_util
 import copy
 import time
 import threading
-# from pymongo import MongoClient
 
 from sampledata import data
 from pydantic import BaseModel
@@ -63,7 +62,7 @@ class StartGameRes(BaseModel):
     ID: str
 
 
-tokens = {"1": "test@test.com", "9c509cf75092475b850af293461d9295": "test@test.com"}
+tokens = {"1": "test@test.com", "31f29295f838405ca6d9eaa37e287f2f": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
 professions = []
@@ -196,5 +195,3 @@ async def websocket_endpoint(websocket: WebSocket):
         res = json.loads(res)
         # print(res)
         websockets[tokens[res[0]]] = websocket
-
-
