@@ -479,7 +479,7 @@ if __name__ == "game_test":
     Game = db.find({"ID": 10})
     try:
         Game[0]["playerList"]
-    except KeyError:
+    except IndexError:
         db.insert_one({"name": "test",
             "ID": 10,
             "timeStamp": time.time(),

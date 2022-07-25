@@ -55,9 +55,12 @@ class DoodadCard(BaseModel):
 
 
 class CreateGame(BaseModel):
-    numPlayers: int
     player: str
     name: str
+
+
+class StartGameRes(BaseModel):
+    ID: str
 
 
 tokens = {"1": "test@test.com", "9c509cf75092475b850af293461d9295": "test@test.com"}
@@ -124,7 +127,7 @@ async def createGame(Game: CreateGame):
         "name": Game.name,
         "ID": gameID,
         "timeStamp": time.time(),
-        "playerList": [Game.numPlayers, tokens[Game.player]],
+        "playerList": [tokens[Game.player]],
         "currentAction": "STARTGAME",
         "currentCard": {},
         "currentTarget": 0,
@@ -175,10 +178,14 @@ async def addCardData(cardData: DoodadCard):
     return False
 
 
-@app.get("/startgame")
-async def startgame():
-    for i in websockets.keys():
-        await websockets[i].send_text("SENT")
+@app.post("/start-game")
+async def startGame(res: StartGameRes):
+    print(res.ID)
+    ID = res.ID
+    currentGame = game.Game(ID, [])
+    currentGame.loadSaveData(websockets)
+    print(currentGame)
+    # currentGame.startGame()
 
 
 @app.websocket("/joinGame")

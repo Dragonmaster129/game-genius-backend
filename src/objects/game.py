@@ -335,7 +335,7 @@ class Game:
     def getCurrentPlayerData(self):
         return self.playerList[self.currentTurn].playerData["playerData"]
 
-    def loadSaveData(self, collection=None):
+    def loadSaveData(self, sockets, collection=None):
         if collection is None:
             collection = mongoClient.client("cashflowDB")["game"]
         loadingGame = collection.find({"ID": self.id})[0]
@@ -349,8 +349,13 @@ class Game:
         self.capitalOrder = loadingGame["capitalOrder"]
         self.cashflowOrder = loadingGame["cashflowOrder"]
         self.beginningOrder = loadingGame["beginningOrder"]
-        # self.playerList = playerList
-        # self.gameStarted = False
+        self.gameStarted = loadingGame["gameStarted"]
+        playerList = []
+        print(loadingGame["playerList"], type(loadingGame["playerList"]))
+        for players in loadingGame["playerList"]:
+            print(players)
+            playerList.append(player.Player(sockets[players], getPlayerData.getPlayerData(players)))
+        self.playerList = playerList
 
 
 if __name__ == "__main__":
