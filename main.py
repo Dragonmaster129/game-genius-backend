@@ -10,6 +10,7 @@ import threading
 from sampledata import data
 from pydantic import BaseModel
 from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard
+from src.basic import paycheck
 from src.objects import game
 # from src import totalUp
 
@@ -58,7 +59,7 @@ class CreateGame(BaseModel):
     name: str
 
 
-class StartGameRes(BaseModel):
+class GetID(BaseModel):
     ID: str
 
 
@@ -178,12 +179,20 @@ async def addCardData(cardData: DoodadCard):
 
 
 @app.post("/start-game")
-async def startGame(res: StartGameRes):
+async def startGame(res: GetID):
     ID = res.ID
     currentGame = game.Game(ID, [])
     currentGame.loadSaveData(websockets)
     currentGame.startGame()
     return res
+
+
+@app.post("/paycheck")
+async def Paycheck(ID: GetID):
+    playerData = getPlayerData.getPlayerData(tokens[ID.ID])["playerData"]
+    print(playerData)
+    paycheck.paycheck(playerData)
+    db["player"].update_one({"email": tokens[ID.ID]}, {"$set": {"playerData": playerData}})
 
 
 @app.websocket("/joinGame")

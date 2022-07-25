@@ -95,6 +95,8 @@ class Game:
             self.nextTurn()
         self.sendMsgToAllPlayers({"EVENT": "Game started"})
         self.saveData()
+        self.currentAction = "STARTTURN"
+        self.nextTurn()
 
     def changeAction(self, action):
         if action in self.actionList or action == "BEGINNING":
@@ -178,6 +180,8 @@ class Game:
     def nextTurn(self):
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
         self.currentTarget = copy.deepcopy(self.currentTurn)
+        if self.currentAction != "BEGINNING":
+            self.sendMsgToCurrentPlayer({"EVENT": "STARTTURN"})
         if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()

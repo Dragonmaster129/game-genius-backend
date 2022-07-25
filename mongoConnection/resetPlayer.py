@@ -20,4 +20,5 @@ def initializePlayerData(email, initialData=None):
     players.update_one({"email": email}, {"$set": {"playerData": initialData}})
 
 
-# initializePlayerData("test@test.com")
+if __name__ == "__main__":
+    initializePlayerData("test@test.com")
