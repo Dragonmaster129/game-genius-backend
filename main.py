@@ -200,9 +200,9 @@ async def startGame(res: GetID):
 @app.post("/paycheck")
 async def Paycheck(ID: GetID):
     playerData = getPlayerData.getPlayerData(tokens[ID.ID])["playerData"]
-    print(playerData)
     paycheck.paycheck(playerData)
     db["player"].update_one({"email": tokens[ID.ID]}, {"$set": {"playerData": playerData}})
+    return playerData
 
 
 @app.post("/capitalGain")
@@ -215,6 +215,74 @@ async def capitalGain(IDs: GetCard):
     currentCard = copy.deepcopy(currentGame.currentCard)
     currentCard.pop("_id")
     return currentCard
+
+
+@app.post("/cashflow")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("CASHFLOW")
+    currentGame.drawCard()
+    currentGame.saveData()
+    currentCard = copy.deepcopy(currentGame.currentCard)
+    currentCard.pop("_id")
+    return currentCard
+
+
+@app.post("/doodad")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("DOODAD")
+    currentGame.drawCard()
+    currentGame.saveData()
+    currentCard = copy.deepcopy(currentGame.currentCard)
+    currentCard.pop("_id")
+    return currentCard
+
+
+@app.post("/market")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("MARKET")
+    currentGame.drawCard()
+    currentGame.saveData()
+    currentCard = copy.deepcopy(currentGame.currentCard)
+    currentCard.pop("_id")
+    return currentCard
+
+
+@app.post("/charity")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("CHARITY")
+    currentGame.saveData()
+    return {"EVENT": "Got charity"}
+
+
+@app.post("/baby")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("BABY")
+    currentGame.saveData()
+    return {"EVENT": "Got baby"}
+
+
+@app.post("/downsized")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("DOWNSIZED")
+    currentGame.saveData()
+    return {"EVENT": "Got downsized"}
+
+
+@app.post("/end-turn")
+async def endTurn(IDs: GetCard):
+    return {"EVENT": "ENDTURN"}
 
 
 @app.websocket("/joinGame")
