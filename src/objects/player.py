@@ -10,8 +10,6 @@ class Player:
         self.beginningCard = {}
 
     def sendMsg(self, message):
-        # TODO figure out how to send the message
-        # send the message through the socket
         try:
             message.pop("_id")
         except KeyError:
@@ -33,6 +31,12 @@ class Player:
 
     def addBeginningCard(self, card):
         self.beginningCard = card
+        for i in card:
+            if i != "description" and i != "_id" and i != "ID" and i != "title":
+                if i == "cash":
+                    self.playerData["playerData"]["cash"] += card[i]
+                    continue
+                self.playerData["playerData"]["assets"][i] = card[i]
         self.sendMsg(card)
 
 

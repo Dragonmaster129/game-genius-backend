@@ -157,6 +157,7 @@ class Game:
     def saveData(self, collection=None):
         if collection is None:
             collection = mongoClient.client("cashflowDB")["game"]
+        self.updateData()
         playerList = [player1.playerData["email"] for player1 in self.playerList]
         collection.update_one({"ID": self.id}, {"$set": {
             "playerList": playerList,

@@ -195,3 +195,4 @@ async def websocket_endpoint(websocket: WebSocket):
         res = json.loads(res)
         # print(res)
         websockets[tokens[res[0]]] = websocket
+        resetPlayer.initializePlayerData(tokens[res[0]])
