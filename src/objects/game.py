@@ -94,9 +94,10 @@ class Game:
             self.drawCard()
             self.nextTurn()
         self.sendMsgToAllPlayers({"EVENT": "Game started"})
-        self.saveData()
         self.currentAction = "STARTTURN"
         self.nextTurn()
+        self.saveData()
+
 
     def changeAction(self, action):
         if action in self.actionList or action == "BEGINNING":

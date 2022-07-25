@@ -63,6 +63,11 @@ class GetID(BaseModel):
     ID: str
 
 
+class GetCard(BaseModel):
+    ID: str
+    gameID: str
+
+
 tokens = {"1": "test@test.com", "31f29295f838405ca6d9eaa37e287f2f": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
@@ -103,6 +108,11 @@ async def getData(tokenID):
     if tokenID in tokens:
         return json_util.dumps(getPlayerData.getPlayerData(tokens[tokenID]))
     return "invalid token"
+
+
+@app.get("/game")
+async def getPlayersCurrentGame(ID: GetID):
+    return db["player"].find({"email": tokens[ID.ID]}, {"_id": 0, "gameID": True})[0]["gameID"]
 
 
 @app.get("/games")
@@ -195,6 +205,18 @@ async def Paycheck(ID: GetID):
     db["player"].update_one({"email": tokens[ID.ID]}, {"$set": {"playerData": playerData}})
 
 
+@app.post("/capitalGain")
+async def capitalGain(IDs: GetCard):
+    currentGame = game.Game(IDs.gameID, [])
+    currentGame.loadSaveData(websockets)
+    currentGame.changeAction("CAPITALGAIN")
+    currentGame.drawCard()
+    currentGame.saveData()
+    currentCard = copy.deepcopy(currentGame.currentCard)
+    currentCard.pop("_id")
+    return currentCard
+
+
 @app.websocket("/joinGame")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -204,4 +226,5 @@ async def websocket_endpoint(websocket: WebSocket):
         res = json.loads(res)
         # print(res)
         websockets[tokens[res[0]]] = websocket
+        db["player"].update_one({"ID": tokens[res[0]]}, {"$set": {"gameID": res[1]}})
         resetPlayer.initializePlayerData(tokens[res[0]])
