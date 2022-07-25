@@ -27,7 +27,6 @@ class Game:
         self.gameStarted = False
 
     def startGame(self):
-        self.playerList.pop(0)
         db = mongoClient.client("cashflowDB")
         Doodad = db["doodad"]
         tmpList = Doodad.find({}, {"_id": 0, "ID": True})
@@ -94,6 +93,7 @@ class Game:
         for i in self.playerList:
             self.drawCard()
             self.nextTurn()
+        self.sendMsgToAllPlayers({"EVENT": "Game started"})
         self.saveData()
 
     def changeAction(self, action):
@@ -351,9 +351,7 @@ class Game:
         self.beginningOrder = loadingGame["beginningOrder"]
         self.gameStarted = loadingGame["gameStarted"]
         playerList = []
-        print(loadingGame["playerList"], type(loadingGame["playerList"]))
         for players in loadingGame["playerList"]:
-            print(players)
             playerList.append(player.Player(sockets[players], getPlayerData.getPlayerData(players)))
         self.playerList = playerList
 

@@ -1,4 +1,5 @@
 from mongoConnection import getPlayerData, mongoClient
+import json
 
 
 class Player:
@@ -10,7 +11,11 @@ class Player:
     def sendMsg(self, message):
         # TODO figure out how to send the message
         # send the message through the socket
-        pass
+        try:
+            message.pop("_id")
+        except KeyError:
+            pass
+        self.socket.send_text(json.dumps(message))
 
     def saveData(self, collection=None):
         if collection is None:

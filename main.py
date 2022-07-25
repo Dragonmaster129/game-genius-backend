@@ -180,12 +180,11 @@ async def addCardData(cardData: DoodadCard):
 
 @app.post("/start-game")
 async def startGame(res: StartGameRes):
-    print(res.ID)
     ID = res.ID
     currentGame = game.Game(ID, [])
     currentGame.loadSaveData(websockets)
-    print(currentGame)
-    # currentGame.startGame()
+    currentGame.startGame()
+    return res
 
 
 @app.websocket("/joinGame")
