@@ -223,7 +223,7 @@ class TestGameplay(unittest.TestCase):
         self.assertTrue(TheGame.playerList[0].saved)
         self.assertTrue(TheGame.playerList[1].saved)
         db = mongoClient.client("cashflowDB")
-        self.assertEqual(db["game"].find({"id": 10})[0]["playerList"],
+        self.assertEqual(db["game"].find({"ID": 10})[0]["playerList"],
                          ["test1@test.com", "test2@test.com", "test3@test.com"])
 
     def test_savePlayerData(self):
@@ -240,7 +240,7 @@ class TestGameplay(unittest.TestCase):
         TheGame.downsizedCurrentPlayer()
         TheGame.saveData()
         db = mongoClient.client("cashflowDB")
-        self.assertEqual(db["game"].find({"id": 10})[0]["playerList"],
+        self.assertEqual(db["game"].find({"ID": 10})[0]["playerList"],
                          ["test4@test.com", "test5@test.com", "test6@test.com"])
         self.assertEqual(
             db["player"].find({"email": "test4@test.com"})[0]["playerData"]["expenses"]["child"][0]["count"],

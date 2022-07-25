@@ -26,6 +26,7 @@ class Game:
         self.gameStarted = False
 
     def startGame(self):
+        self.playerList.pop(0)
         db = mongoClient.client("cashflowDB")
         Doodad = db["doodad"]
         tmpList = Doodad.find({}, {"_id": 0, "ID": True})
@@ -155,7 +156,7 @@ class Game:
         if collection is None:
             collection = mongoClient.client("cashflowDB")["game"]
         playerList = [player1.playerData["email"] for player1 in self.playerList]
-        collection.update_one({"id": self.id}, {"$set": {
+        collection.update_one({"ID": self.id}, {"$set": {
             "playerList": playerList,
             "currentTurn": self.currentTurn,
             "currentAction": self.currentAction,
@@ -334,7 +335,7 @@ class Game:
     def loadSaveData(self, collection=None):
         if collection is None:
             collection = mongoClient.client("cashflowDB")["game"]
-        loadingGame = collection.find({"id": self.id})[0]
+        loadingGame = collection.find({"ID": self.id})[0]
         self.currentTarget = loadingGame["currentTarget"]
         self.currentTurn = loadingGame["currentTurn"]
         self.currentCard = loadingGame["currentCard"]
