@@ -3,6 +3,7 @@ import unittest
 from mongoConnection import getPlayerData, resetPlayer, mongoClient
 from tests import player_test
 import copy
+import time
 
 
 class TestGame(game.Game):
@@ -474,4 +475,24 @@ def suite():
 # Change the name to the name of the file dropping the .py
 if __name__ == "game_test":
     runner = unittest.TextTestRunner()
+    db = mongoClient.client("cashflowDB")["game"]
+    Game = db.find({"ID": 10})
+    try:
+        Game[0]["playerList"]
+    except KeyError:
+        db.insert_one({"name": "test",
+            "ID": 10,
+            "timeStamp": time.time(),
+            "playerList": [],
+            "currentAction": "STARTGAME",
+            "currentCard": {},
+            "currentTarget": 0,
+            "currentTurn": 0,
+            "beginningOrder": [],
+            "capitalOrder": [],
+            "cashflowOrder": [],
+            "doodadOrder": [],
+            "marketOrder": [],
+            "gameStarted": False,
+        })
     runner.run(suite())

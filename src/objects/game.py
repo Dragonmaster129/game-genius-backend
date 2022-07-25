@@ -6,6 +6,7 @@ from sampledata import data
 from src.objects import player
 import copy
 import random
+import time
 
 
 class Game:
@@ -93,6 +94,7 @@ class Game:
         for i in self.playerList:
             self.drawCard()
             self.nextTurn()
+        self.saveData()
 
     def changeAction(self, action):
         if action in self.actionList or action == "BEGINNING":
@@ -158,6 +160,7 @@ class Game:
         playerList = [player1.playerData["email"] for player1 in self.playerList]
         collection.update_one({"ID": self.id}, {"$set": {
             "playerList": playerList,
+            "timeStamp": time.time(),
             "currentTurn": self.currentTurn,
             "currentAction": self.currentAction,
             "currentCard": self.currentCard,

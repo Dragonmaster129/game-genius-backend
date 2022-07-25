@@ -5,6 +5,7 @@ import uuid
 from bson import json_util
 import copy
 import time
+import threading
 # from pymongo import MongoClient
 
 from sampledata import data
@@ -53,7 +54,13 @@ class DoodadCard(BaseModel):
     description: str
 
 
-tokens = {"1": "test@test.com"}
+class CreateGame(BaseModel):
+    numPlayers: int
+    player: str
+    name: str
+
+
+tokens = {"1": "test@test.com", "9c509cf75092475b850af293461d9295": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
 professions = []
@@ -72,6 +79,22 @@ for i in temp:
 # player
 
 
+def deleteGames():
+    while True:
+        time.sleep(60)
+        gameList = db["game"].find({}, {"_id": 0, "ID": True, "timeStamp": True})
+        for Game in gameList:
+            try:
+                if time.time() - Game["timeStamp"] > 2 * 60 * 60 * 24 * 7:
+                    db.game.delete_one({"ID": Game["ID"]})
+            except KeyError:
+                db.game.delete_one({"ID": Game["ID"]})
+
+
+deleteThread = threading.Thread(target=deleteGames, daemon=True)
+deleteThread.start()
+
+
 @app.get("/data/{tokenID}")
 async def getData(tokenID):
     if tokenID in tokens:
@@ -81,14 +104,39 @@ async def getData(tokenID):
 
 @app.get("/games")
 async def getGames():
-    gameList = db["game"].find({"gameStarted": 0})
+    gameList = db["game"].find({"gameStarted": False})
+    newGameList = []
+    for i in gameList:
+        i.pop("_id")
+        newGameList.append(i)
+    newGameList.reverse()
     # TODO sort through the data and return a list
+    return newGameList
 
 
 @app.post("/create-game")
-async def createGame():
+async def createGame(Game: CreateGame):
     # TODO get the data and create the game
-    pass
+    # choose the ID randomly and create a player list. Append the players to the player list and
+    # have the player list at the start have the number of players that it is limited to.
+    gameID = uuid.uuid4().hex
+    db["game"].insert_one({
+        "name": Game.name,
+        "ID": gameID,
+        "timeStamp": time.time(),
+        "playerList": [Game.numPlayers, tokens[Game.player]],
+        "currentAction": "STARTGAME",
+        "currentCard": {},
+        "currentTarget": 0,
+        "currentTurn": 0,
+        "beginningOrder": [],
+        "capitalOrder": [],
+        "cashflowOrder": [],
+        "doodadOrder": [],
+        "marketOrder": [],
+        "gameStarted": False,
+    })
+    return json.dumps({"name": Game.name, "ID": gameID})
 
 
 @app.delete("/end-game")
@@ -127,8 +175,8 @@ async def addCardData(cardData: DoodadCard):
     return False
 
 
-@app.get("/activateEvent")
-async def activateEvent():
+@app.get("/startgame")
+async def startgame():
     for i in websockets.keys():
         await websockets[i].send_text("SENT")
 
@@ -139,5 +187,8 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         res = await websocket.receive_text()
         # await websocket.send_text(f"Message text was: {res}")
+        res = json.loads(res)
         # print(res)
         websockets[tokens[res[0]]] = websocket
+
+
