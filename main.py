@@ -230,8 +230,7 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("CASHFLOW")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = copy.deepcopy(currentGame.currentCard)
-    currentCard.pop("_id")
+    currentCard = currentGame.sendPlayerTheirOptions()
     return currentCard
 
 
@@ -241,8 +240,7 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("DOODAD")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = copy.deepcopy(currentGame.currentCard)
-    currentCard.pop("_id")
+    currentCard = currentGame.sendPlayerTheirOptions()
     return currentCard
 
 
@@ -252,8 +250,7 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("MARKET")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = copy.deepcopy(currentGame.currentCard)
-    currentCard.pop("_id")
+    currentCard = currentGame.sendPlayerTheirOptions()
     return currentCard
 
 
@@ -292,6 +289,20 @@ async def endTurn(IDs: GetCard):
 async def buyCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.buyItem(currentGame.currentCard["card"], IDs.amount)
+    if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
+        currentGame.changeAction("MARKET")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Sell")
+async def buyCard(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
+    currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
+    if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
+        currentGame.changeAction("MARKET")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData

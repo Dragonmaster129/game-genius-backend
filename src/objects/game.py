@@ -102,6 +102,7 @@ class Game:
     def changeAction(self, action):
         if action in self.actionList or action == "BEGINNING":
             self.currentAction = action
+            self.sendMsgToCurrentPlayer({"EVENT": self.currentAction})
 
     def fillCardDraws(self):
         search = mongoClient.client("cashflowDB")[self.currentAction.lower()]
@@ -188,7 +189,10 @@ class Game:
     def sendPlayerTheirOptions(self):
         optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
         if self.currentCard["type"] == "realestate":
-            optionsCard["options"] = ["Buy", "Don't buy"]
+            if self.currentAction != "MARKET":
+                optionsCard["options"] = ["Buy", "Don't buy"]
+            else:
+                optionsCard["options"] = ["Sell", "Don't Sell"]
         if self.currentCard['type'] == "stock":
             optionsCard["options"] = ["Amount", "Buy", "Sell", "Do nothing"]
         return optionsCard
@@ -273,6 +277,9 @@ class Game:
     def forcedSaleAll(self, cardType, price):
         for player1 in self.playerList:
             forcedSale.forcedSale(cardType, player1.playerData["playerData"], price)
+
+    def findFirstValue(self, cardType):
+        return forcedSale.findFirstIteration(self.playerList[self.currentTarget].playerData["playerData"], cardType)
 
     def forcedSaleTarget(self, cardType, price):
         forcedSale.forcedSale(cardType, self.playerList[self.currentTarget].playerData["playerData"], price)

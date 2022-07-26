@@ -45,3 +45,17 @@ def findHighest(data):
                     highest = [i, iteration, item["value"]]
                     iteration += 1
     return highest
+
+
+def findFirstIteration(data, name):
+    item = [""]
+    for i in data["assets"]:
+        if i == "realestate" or i == "land":
+            iteration = 0
+            for item in data["assets"][i]:
+                if item["name"] == name:
+                    item = ["assets", i, iteration]
+                    break
+        if item != [""]:
+            breakf
+    return item
