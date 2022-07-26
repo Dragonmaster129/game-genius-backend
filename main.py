@@ -120,6 +120,45 @@ async def getData(tokenID):
     return "invalid token"
 
 
+@app.get("/getcard")
+async def getCard(auth: str = 0, ID: str = 0, collection: str = ""):
+    if auth in tokens:
+        card = db[collection].find({"ID": ID})[0]
+        card.pop("_id")
+        return card
+    return False
+
+
+@app.get("/cards")
+async def getCards():
+    beginning = db["beginning"].find()
+    capitalgain = db["capitalgain"].find()
+    cashflow = db["cashflow"].find()
+    doodad = db["doodad"].find()
+    initialData = db["initialData"].find()
+    market = db["market"].find()
+    allCards = {"beginning": [], "capitalgain": [], "cashflow": [], "doodad": [], "initialData": [], "market": []}
+    for i in beginning:
+        i.pop("_id")
+        allCards["beginning"].append(i)
+    for i in capitalgain:
+        i.pop("_id")
+        allCards["capitalgain"].append(i)
+    for i in cashflow:
+        i.pop("_id")
+        allCards["cashflow"].append(i)
+    for i in doodad:
+        i.pop("_id")
+        allCards["doodad"].append(i)
+    for i in initialData:
+        i.pop("_id")
+        allCards["initialData"].append(i)
+    for i in market:
+        i.pop("_id")
+        allCards["market"].append(i)
+    return allCards
+
+
 @app.get("/game")
 async def getPlayersCurrentGame(ID: GetID):
     return db["player"].find({"email": tokens[ID.ID]}, {"_id": 0, "gameID": True})[0]["gameID"]
@@ -207,10 +246,11 @@ async def startGame(res: GetID):
 
 
 @app.post("/paycheck")
-async def Paycheck(ID: GetID):
-    playerData = getPlayerData.getPlayerData(tokens[ID.ID])["playerData"]
-    paycheck.paycheck(playerData)
-    db["player"].update_one({"email": tokens[ID.ID]}, {"$set": {"playerData": playerData}})
+async def Paycheck(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.receivePaycheck()
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData
 
 
@@ -291,6 +331,21 @@ async def buyCard(IDs: GetChoice):
     currentGame.buyItem(currentGame.currentCard["card"], IDs.amount)
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
+    else:
+        currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Take")
+async def takeCard(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    try:
+        currentGame.REUpgrade(currentGame.currentCard["property"], currentGame.currentCard["name"])
+    except KeyError:
+        pass
+    currentGame.changeAction("ENDTURN")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData
@@ -299,10 +354,20 @@ async def buyCard(IDs: GetChoice):
 @app.post("/choice/Sell")
 async def buyCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
-    sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
-    currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
+    if IDs.amount != 0:
+        sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
+        if currentGame.currentCard["name"] == "PLEX":
+            for i in ["DUPLEX", "4-PLEX", "8-PLEX"]:
+                sellItem = currentGame.findFirstValue(i)
+                currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
+        try:
+            currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
+        except KeyError:
+            currentGame.sellCard(sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount, currentGame.currentCard["name"])
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
+    else:
+        currentGame.changeAction("ENDTURN")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData
@@ -323,4 +388,11 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.post("/choice/{slug}")
 async def doNothing(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
+        currentGame.changeAction("MARKET")
+    elif currentGame.currentAction == "STARTTURN":
+        pass
+    else:
+        currentGame.changeAction("ENDTURN")
     return getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]

@@ -50,12 +50,12 @@ def findHighest(data):
 def findFirstIteration(data, name):
     item = [""]
     for i in data["assets"]:
-        if i == "realestate" or i == "land":
+        if i == "realestate" or i == "land" or i == "stock":
             iteration = 0
             for item in data["assets"][i]:
                 if item["name"] == name:
                     item = ["assets", i, iteration]
                     break
         if item != [""]:
-            breakf
+            break
     return item

@@ -192,7 +192,11 @@ class Game:
             if self.currentAction != "MARKET":
                 optionsCard["options"] = ["Buy", "Don't buy"]
             else:
-                optionsCard["options"] = ["Sell", "Don't Sell"]
+                try:
+                    if self.currentCard["property"]:
+                        optionsCard["options"] = ["Take", "Don't take it"]
+                except KeyError:
+                    optionsCard["options"] = ["Sell", "Don't Sell"]
         if self.currentCard['type'] == "stock":
             optionsCard["options"] = ["Amount", "Buy", "Sell", "Do nothing"]
         return optionsCard
@@ -269,9 +273,12 @@ class Game:
         self.updateData()
 
     def sellCard(self, itemData, price, amount, sellType):
-        if (self.playerList[self.currentTarget]
-                .playerData["playerData"][itemData[0]][itemData[1]][itemData[2]-1]["name"]) == sellType:
-            sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
+        try:
+            if (self.playerList[self.currentTarget]
+                    .playerData["playerData"][itemData[0]][itemData[1]][itemData[2]-1]["name"]) == sellType:
+                sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
+        except KeyError:
+            pass
         # itemData, data, playerAction, price, amount
 
     def forcedSaleAll(self, cardType, price):

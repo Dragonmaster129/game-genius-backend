@@ -36,7 +36,14 @@ capitalGain = {
 }
 
 cashFlow = {
-
+    "title": str, # the bold words at the top of the card
+    "description": str, # the words on the card
+    "type": str, # realestate, business (D2Y, Royalty), dividend, OPTION
+    "name": str, # DUPLEX, STARTERHOUSE, CARD 1, Partner with a Pro, ROYALTY
+    "card": object,
+    # in the realestate case there is name, cost, (CONTINUED.)
+    # mortgage, downpay and cashflow, in the business case, name, cost and cashflow, (CONTINUED.)
+    # in the dividend case name, cost, downpay, cashflow, in the option case: cost.
 }
 
 beginning = {

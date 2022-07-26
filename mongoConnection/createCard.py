@@ -25,7 +25,6 @@ def createCard(cardData, collection):
 # player
 
 
-
 if __name__ == "__main__":
     # createCard({"description": "Description 50", "cash": 20, "cashflow": 200, "category": "other"}, "doodad")
     # createCard({"description": "Words that make the capital", "deleteThis": 1}, "cashflow")
@@ -48,19 +47,40 @@ if __name__ == "__main__":
 #         }
 #     }
 #     createCard(capitalGain, "capitalgain")
-    market = {
-        "title": "House Buyer",
-        "description": """Buyer offers $75,000 for a "starter house" (2 bedroom/1 bath). Has own financing.
-Everyone may sell at this price.
-If you sell, pay off the related mortgage, and give up the net cash flow you currently receive on this property""",
-        "type": "realestate",  # eg. realestate, stock, land, business, dividend, insurance, child marries, (CONTINUED.)
-        # pollution, natural disaster, CHARITY, mentor
-        "name": "STARTERHOUSE",  # eg. MYT4U, OK4U, 4-PLEX, STARTERHOUSE, APARTMENTCOMPLEX, ALL. What card affects
-        "highest": False,  # when realestate, affects the highest value of property
-        "price": 75000,  # eg. the stock price, what you are selling realestate for per unit, land. (CONTINUED.)
-        # when child marries pay amount.
-        "forcedSale": False,  # You have no choice but to sell.
-        "target": "Player",  # eg. Player, player your right, everyone, right all, starts with you and moves to the right.
+#     market = {
+#         "title": "Apartment Buyer",  # The bold words at the top of the card
+#         "description": """Buyer offers $35,000 per unit for all units in apartment houses.
+# Everyone may sell at this price.
+# If you sell, pay off the related mortgage, and give up the net cash flow you currently receive on this property.""",  # exactly what is on the card telling you what to do
+#         "type": "realestate",  # eg. realestate, stock, land, business, dividend, insurance, child marries, (CONTINUED.)
+#         # pollution, natural disaster, CHARITY, mentor
+#         "name": "APARTMENTCOMPLEX",  # eg. MYT4U, OK4U, 4-PLEX, STARTERHOUSE, APARTMENTCOMPLEX, ALL. What card affects
+#         "highest": False, # when realestate, affects the highest value of property
+#         "price": 35000, # eg. the stock price, what you are selling realestate for per unit, land. (CONTINUED.)
+#         "forcedSale": False, # You have no choice but to sell.
+#         "target": "All",  # eg. Player, player your right, everyone, right all, starts with you and moves to the right.
+#     }
+#     createCard(market, "market")
+    cashflow = {
+        "title": "8-plex for Sale",  # the bold words at the top of the card
+        "description": """Great rental area. Low vacancy rate.
+Use this for yourself or sell the opportunity.
+48% ROI, may sell for $240,000 to $320,000
+Cost: $200,000
+Mortgage: $160,000
+Down Pay: $40,000
+Cash Flow: +$1,600""",  # the words on the card
+        "type": "realestate",  # stock, realestate, land, business (D2Y)
+        "name": "8-PLEX",  # MYT4U, OK4U, DUPLEX, STARTERHOUSE, LAND, CARD 1
+        "card": {
+            "type": "realestate",
+            "name": "8-PLEX",
+            "size": 8,
+            "cost": 200000,
+            "mortgage": 160000,
+            "downpay": 40000,
+            "value": 1600,
+        },
     }
-    createCard(market, "market")
+    createCard(cashflow, "cashflow")
     pass
