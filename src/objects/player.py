@@ -37,7 +37,7 @@ class Player:
                     self.playerData["playerData"]["cash"] += card[i]
                     continue
                 self.playerData["playerData"]["assets"][i] = card[i]
-        self.sendMsg(card)
+        self.sendMsg({"description": card["description"], "options": ["OK"]})
 
 
 if __name__ == "__main__":

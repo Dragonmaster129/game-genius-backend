@@ -4,6 +4,7 @@ from mongoConnection import getPlayerData, resetPlayer, mongoClient
 from tests import player_test
 import copy
 import time
+from src.basic import downsized
 
 
 class TestGame(game.Game):
@@ -14,6 +15,13 @@ class TestGame(game.Game):
         if not self.gameStarted:
             resetPlayer.initializePlayerData(email)
             self.playerList.append(player_test.TestPlayer(getPlayerData.getPlayerData(email)))
+
+    def nextTurn(self):
+        self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
+        self.currentTarget = copy.deepcopy(self.currentTurn)
+        if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
+            self.sendMsgToCurrentPlayer("SKIPPED")
+            self.nextTurn()
 
 
 class TestGameplay(unittest.TestCase):
@@ -231,9 +239,9 @@ class TestGameplay(unittest.TestCase):
         resetPlayer.initializePlayerData("test4@test.com")
         resetPlayer.initializePlayerData("test5@test.com")
         resetPlayer.initializePlayerData("test6@test.com")
-        TheGame = game.Game(10, [player.Player(1234, getPlayerData.getPlayerData("test4@test.com")),
-                                 player.Player(213, getPlayerData.getPlayerData("test5@test.com")),
-                                 player.Player(312, getPlayerData.getPlayerData("test6@test.com"))])
+        TheGame = game.Game(10, [player_test.SaveTestPlayer(getPlayerData.getPlayerData("test4@test.com")),
+                                 player_test.SaveTestPlayer(getPlayerData.getPlayerData("test5@test.com")),
+                                 player_test.SaveTestPlayer(getPlayerData.getPlayerData("test6@test.com"))])
         TheGame.getBaby()
         TheGame.nextTurn()
         TheGame.getCharity()

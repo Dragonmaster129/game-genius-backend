@@ -92,12 +92,12 @@ class Game:
         self.changeAction("BEGINNING")
         for i in self.playerList:
             self.drawCard()
+            self.actOnCard()
             self.nextTurn()
         self.sendMsgToAllPlayers({"EVENT": "Game started"})
         self.currentAction = "STARTTURN"
-        self.nextTurn()
+        self.sendMsgToCurrentPlayer({"EVENT": "STARTTURN"})
         self.saveData()
-
 
     def changeAction(self, action):
         if action in self.actionList or action == "BEGINNING":
@@ -151,11 +151,47 @@ class Game:
                 if not self.beginningOrder:
                     self.fillCardDraws()
             self.currentCard = db.find({"ID": nextCard})[0]
-            self.actOnCard()
 
-    def actOnCard(self):
+    def actOnCard(self, playerOptions=None):
+        if playerOptions is None:
+            playerOptions = {}
         if self.currentAction == "BEGINNING":
             self.playerList[self.currentTurn].addBeginningCard(self.currentCard)
+        elif self.currentAction == "DOODAD":
+            self.doodad(cash=playerOptions["cash"], cashflow=playerOptions["cashflow"],
+                        category=playerOptions["category"])
+        elif self.currentAction == "MARKET":
+            # market = {
+            #     "title": str,  # The bold words at the top of the card
+            #     "description": str,  # exactly what is on the card telling you what to do
+            #     "type": str,  # eg. realestate, stock, land, business, dividend, insurance, child marries, (CONTINUED.)
+            #     # pollution, natural disaster, CHARITY, mentor
+            #     "name": str,  # eg. MYT4U, OK4U, 4-PLEX, STARTERHOUSE, APARTMENTCOMPLEX, ALL. What card affects
+            #     "highest": bool,  # when realestate, affects the highest value of property
+            #     "price": int or str,
+            #     # eg. the stock price, what you are selling realestate for per unit, land. (CONTINUED.)
+            #     # when child marries pay amount.
+            #     "bankrupt": bool,  # eg. stock fails, lose all shares
+            #     "size": int,  # in land, selling 5 acres or 10 acres
+            #     "value": int,  # in spare time co, you get a $7000 value, foreign trade and recession will have this too
+            #     "property": object,  # exchange deals, your starter house changes to 4-PLEX, record these new numbers.
+            #     "forcedSale": bool,  # You have no choice but to sell.
+            #     "target": str,
+            #     # eg. Player, player your right, everyone, right all, starts with you and moves to the right.
+            # }
+            sellTypes = ["realestate", "stock", "land"]
+            if self.currentCard["type"] in sellTypes:
+                self.sellCard(playerOptions[0:2], self.currentCard["price"], playerOptions[3], self.currentCard["name"])
+        elif self.currentAction == "CAPITALGAIN":
+            self.buyItem(self.currentCard["card"], 1)
+
+    def sendPlayerTheirOptions(self):
+        optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
+        if self.currentCard["type"] == "realestate":
+            optionsCard["options"] = ["Buy", "Don't buy"]
+        if self.currentCard['type'] == "stock":
+            optionsCard["options"] = ["Amount", "Buy", "Sell", "Do nothing"]
+        return optionsCard
 
     def saveData(self, collection=None):
         if collection is None:

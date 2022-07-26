@@ -68,6 +68,10 @@ class GetCard(BaseModel):
     gameID: str
 
 
+class GetChoice(GetCard):
+    amount: int
+
+
 tokens = {"1": "test@test.com", "31f29295f838405ca6d9eaa37e287f2f": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
@@ -101,6 +105,12 @@ def deleteGames():
 
 deleteThread = threading.Thread(target=deleteGames, daemon=True)
 deleteThread.start()
+
+
+def loadCurrentGame(gameID):
+    currentGame = game.Game(gameID, [])
+    currentGame.loadSaveData(websockets)
+    return currentGame
 
 
 @app.get("/data/{tokenID}")
@@ -191,8 +201,7 @@ async def addCardData(cardData: DoodadCard):
 @app.post("/start-game")
 async def startGame(res: GetID):
     ID = res.ID
-    currentGame = game.Game(ID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(ID)
     currentGame.startGame()
     return res
 
@@ -207,20 +216,17 @@ async def Paycheck(ID: GetID):
 
 @app.post("/capitalGain")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CAPITALGAIN")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = copy.deepcopy(currentGame.currentCard)
-    currentCard.pop("_id")
+    currentCard = currentGame.sendPlayerTheirOptions()
     return currentCard
 
 
 @app.post("/cashflow")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CASHFLOW")
     currentGame.drawCard()
     currentGame.saveData()
@@ -231,8 +237,7 @@ async def capitalGain(IDs: GetCard):
 
 @app.post("/doodad")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("DOODAD")
     currentGame.drawCard()
     currentGame.saveData()
@@ -243,8 +248,7 @@ async def capitalGain(IDs: GetCard):
 
 @app.post("/market")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("MARKET")
     currentGame.drawCard()
     currentGame.saveData()
@@ -255,8 +259,7 @@ async def capitalGain(IDs: GetCard):
 
 @app.post("/charity")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CHARITY")
     currentGame.saveData()
     return {"EVENT": "Got charity"}
@@ -264,8 +267,7 @@ async def capitalGain(IDs: GetCard):
 
 @app.post("/baby")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("BABY")
     currentGame.saveData()
     return {"EVENT": "Got baby"}
@@ -273,8 +275,7 @@ async def capitalGain(IDs: GetCard):
 
 @app.post("/downsized")
 async def capitalGain(IDs: GetCard):
-    currentGame = game.Game(IDs.gameID, [])
-    currentGame.loadSaveData(websockets)
+    currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("DOWNSIZED")
     currentGame.saveData()
     return {"EVENT": "Got downsized"}
@@ -282,7 +283,18 @@ async def capitalGain(IDs: GetCard):
 
 @app.post("/end-turn")
 async def endTurn(IDs: GetCard):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.nextTurn()
     return {"EVENT": "ENDTURN"}
+
+
+@app.post("/choice/Buy")
+async def buyCard(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.buyItem(currentGame.currentCard["card"], IDs.amount)
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
 
 
 @app.websocket("/joinGame")
@@ -296,3 +308,8 @@ async def websocket_endpoint(websocket: WebSocket):
         websockets[tokens[res[0]]] = websocket
         db["player"].update_one({"ID": tokens[res[0]]}, {"$set": {"gameID": res[1]}})
         resetPlayer.initializePlayerData(tokens[res[0]])
+
+
+@app.post("/choice/{slug}")
+async def doNothing(IDs: GetChoice):
+    return getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
