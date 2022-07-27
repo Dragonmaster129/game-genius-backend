@@ -43,15 +43,10 @@ class LoginData(BaseModel):
     password: str
 
 
-class DoodadCard(BaseModel):
-    cardType: str
-    cashflow: int
-    cash: int
-    baby: bool
-    cashflowType: str
+class AddCard(BaseModel):
     token: str
-    title: str
-    description: str
+    card: object
+    cardType: str
 
 
 class BeginningCard(BaseModel):
@@ -210,12 +205,6 @@ async def createGame(Game: CreateGame):
     return json.dumps({"name": Game.name, "ID": gameID})
 
 
-@app.delete("/end-game")
-async def deleteGame():
-    # TODO when the game is over/no players been in for a long time, delete the game
-    pass
-
-
 @app.post("/login")
 async def login(request: LoginData):
     time.sleep(1)
@@ -238,26 +227,11 @@ async def reset(tokenID):
     return False
 
 
-@app.post("/card/add/doodad")
-async def addDoodadCardData(cardData: DoodadCard):
+@app.post("/card/add")
+async def addCardData(cardData: AddCard):
     if cardData.token in authTokens:
-        card = {
-            "cashflow": cardData.cashflow,
-            "cash": cardData.cash,
-            "baby": cardData.baby,
-            "cashflowType": cardData.cashflowType,
-            "title": cardData.title,
-            "description": cardData.description,
-        }
+        card = cardData.card
         createCard.createCard(card, cardData.cardType)
-        return True
-    return False
-
-
-@app.post("/card/add/beginning")
-async def addBeginningCardData(cardData: BeginningCard):
-    if cardData.token in authTokens:
-        createCard.createCard(cardData, "beginning")
         return True
     return False
 
