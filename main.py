@@ -9,7 +9,7 @@ import threading
 
 from sampledata import data
 from pydantic import BaseModel
-from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard
+from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard, deleteCard
 from src.objects import game
 # from src import totalUp
 
@@ -131,6 +131,15 @@ async def getCard(auth: str = 0, ID: str = 0, collection: str = ""):
         card.pop("_id")
         return card
     return False
+
+
+@app.delete("/delete-card")
+async def DeleteCard(auth: str = 0, ID: str = 0, collection: str = ""):
+    if auth in tokens:
+        deleteCard.deleteCard(collection, ID)
+        return True
+    return False
+
 
 
 @app.get("/cards")
