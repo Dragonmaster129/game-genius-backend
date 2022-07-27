@@ -18,7 +18,7 @@ market = {
     "bankrupt": bool, # eg. stock fails, lose all shares
     "size": int, # in land, selling 5 acres or 10 acres
     "value": int, # in spare time co, you get a $7000 value, foreign trade and recession will have this too
-    "property": object, # exchange deals, your starter house changes to 4-PLEX, record these new numbers.
+    "newProperty": object, # exchange deals, your starter house changes to 4-PLEX, record these new numbers.
     "forcedSale": bool, # You have no choice but to sell.
     "target": str, # eg. Player, player your right, everyone, right all, starts with you and moves to the right.
 }
@@ -29,7 +29,7 @@ capitalGain = {
     "type": str, # stock, realestate, land, business (D2Y)
     "option": str, # in the stock category, is it a CALL, PUT, REGULAR, or SHORT
     "name": str, # MYT4U, OK4U, DUPLEX, STARTERHOUSE, LAND, CARD 1
-    "card": object, # in the stock case, there is the current price, option, strikePrice, and name,
+    "card": object, # in the stock case, there is the current price, option, strikePrice, name, and target
     # in the realestate case there is name, cost, (CONTINUED.)
     # mortgage, downpay and cashflow, in the land case, the same as realestate, in the business case, cost and cashflow.
 

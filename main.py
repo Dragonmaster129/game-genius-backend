@@ -367,7 +367,7 @@ async def buyCard(IDs: GetChoice):
 async def takeCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     try:
-        currentGame.REUpgrade(currentGame.currentCard["property"], currentGame.currentCard["name"])
+        currentGame.REUpgrade(currentGame.currentCard["newProperty"], currentGame.currentCard["name"])
     except KeyError:
         pass
     currentGame.changeAction("ENDTURN")
@@ -377,7 +377,7 @@ async def takeCard(IDs: GetChoice):
 
 
 @app.post("/choice/Sell")
-async def buyCard(IDs: GetChoice):
+async def sellCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     if IDs.amount != 0:
         sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
@@ -389,6 +389,18 @@ async def buyCard(IDs: GetChoice):
             currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
         except KeyError:
             currentGame.sellCard(sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount, currentGame.currentCard["name"])
+    if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
+        currentGame.changeAction("MARKET")
+    else:
+        currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Short")
+async def shortCard(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
     else:

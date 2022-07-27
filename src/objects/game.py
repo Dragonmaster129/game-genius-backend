@@ -193,12 +193,17 @@ class Game:
                 optionsCard["options"] = ["Buy", "Don't buy"]
             else:
                 try:
-                    if self.currentCard["property"]:
+                    if self.currentCard["newProperty"]:
                         optionsCard["options"] = ["Take", "Don't take it"]
                 except KeyError:
                     optionsCard["options"] = ["Sell", "Don't Sell"]
-        if self.currentCard['type'] == "stock":
-            optionsCard["options"] = ["Amount", "Buy", "Sell", "Do nothing"]
+        try:
+            if self.currentCard["card"]['type'] == "stock":
+                print(self.currentCard)
+                if self.currentCard["card"]["option"] == "regular":
+                    optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
+        except KeyError:
+            print(self.currentCard)
         return optionsCard
 
     def saveData(self, collection=None):
