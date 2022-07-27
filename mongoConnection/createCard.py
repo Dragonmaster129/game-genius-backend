@@ -10,8 +10,12 @@ def createCard(cardData, collection):
             createCard(cardData, collection)
     except IndexError:
         db.insert_one({"ID": ID})
-        for i in cardData.keys():
-            db.update_one({"ID": ID}, {"$set": {i: cardData[i]}})
+        try:
+            for i in cardData.keys():
+                db.update_one({"ID": ID}, {"$set": {i: cardData[i]}})
+        except AttributeError:
+            print(cardData)
+            db.delete_one({"ID": ID})
 
 
 # list of collections in DB

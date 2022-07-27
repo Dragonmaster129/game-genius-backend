@@ -10,7 +10,6 @@ import threading
 from sampledata import data
 from pydantic import BaseModel
 from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard
-from src.basic import paycheck
 from src.objects import game
 # from src import totalUp
 
@@ -51,7 +50,17 @@ class DoodadCard(BaseModel):
     baby: bool
     cashflowType: str
     token: str
+    title: str
     description: str
+
+
+class BeginningCard(BaseModel):
+    token: str
+    title: str
+    description: str
+    cash: int
+    stock: list
+    realestate: list
 
 
 class CreateGame(BaseModel):
@@ -230,9 +239,25 @@ async def reset(tokenID):
 
 
 @app.post("/card/add/doodad")
-async def addCardData(cardData: DoodadCard):
+async def addDoodadCardData(cardData: DoodadCard):
     if cardData.token in authTokens:
-        createCard.createCard(cardData, "doodad")
+        card = {
+            "cashflow": cardData.cashflow,
+            "cash": cardData.cash,
+            "baby": cardData.baby,
+            "cashflowType": cardData.cashflowType,
+            "title": cardData.title,
+            "description": cardData.description,
+        }
+        createCard.createCard(card, cardData.cardType)
+        return True
+    return False
+
+
+@app.post("/card/add/beginning")
+async def addBeginningCardData(cardData: BeginningCard):
+    if cardData.token in authTokens:
+        createCard.createCard(cardData, "beginning")
         return True
     return False
 
