@@ -188,22 +188,33 @@ class Game:
 
     def sendPlayerTheirOptions(self):
         optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
-        if self.currentCard["type"] == "realestate":
-            if self.currentAction != "MARKET":
-                optionsCard["options"] = ["Buy", "Don't buy"]
-            else:
+        if self.currentAction != "DOODAD":
+            try:
+                if self.currentCard["card"]["type"] == "realestate":
+                        optionsCard["options"] = ["Buy", "Don't buy"]
+
                 try:
-                    if self.currentCard["newProperty"]:
-                        optionsCard["options"] = ["Take", "Don't take it"]
+                    if self.currentCard["card"]['type'] == "stock":
+                        print(self.currentCard)
+                        if self.currentCard["card"]["option"] == "regular":
+                            optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
                 except KeyError:
-                    optionsCard["options"] = ["Sell", "Don't Sell"]
-        try:
-            if self.currentCard["card"]['type'] == "stock":
-                print(self.currentCard)
-                if self.currentCard["card"]["option"] == "regular":
-                    optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
-        except KeyError:
-            print(self.currentCard)
+                    print(self.currentCard)
+            except KeyError:
+                if self.currentCard["type"] == "realestate":
+                    if self.currentAction == "MARKET":
+                        try:
+                            if self.currentCard["newProperty"]:
+                                optionsCard["options"] = ["Take", "Don't take it"]
+                        except KeyError:
+                            optionsCard["options"] = ["Sell", "Don't Sell"]
+        else:
+            optionsCard["options"] = ["OK"]
+        return optionsCard
+
+    def sendPlayerCharityOptions(self):
+        optionsCard = {"description": "Charity costs 10% of your total income", "title": "Donate to Charity",
+                       "options": ["Give", "Don't"]}
         return optionsCard
 
     def saveData(self, collection=None):

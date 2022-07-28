@@ -316,7 +316,8 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CHARITY")
     currentGame.saveData()
-    return {"EVENT": "Got charity"}
+    currentCard = currentGame.sendPlayerCharityOptions()
+    return currentCard
 
 
 @app.post("/baby")
@@ -373,8 +374,8 @@ async def sellCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     if IDs.amount != 0:
         sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
-        if currentGame.currentCard["name"] == "PLEX":
-            for i in ["DUPLEX", "4-PLEX", "8-PLEX"]:
+        if currentGame.currentCard["name"] == "plex":
+            for i in ["duplex", "4-plex", "8-plex"]:
                 sellItem = currentGame.findFirstValue(i)
                 currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
         try:
@@ -397,6 +398,27 @@ async def shortCard(IDs: GetChoice):
         currentGame.changeAction("MARKET")
     else:
         currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/OK")
+async def OKCard(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    if currentGame.currentAction == "DOODAD":
+        currentGame.doodad(currentGame.currentCard["cash"], currentGame.currentCard["cashflow"], currentGame.currentCard["category"])
+        currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Give")
+async def GiveCard(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.getCharity()
+    currentGame.changeAction("ENDTURN")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData
