@@ -53,6 +53,7 @@ def findFirstIteration(data, name):
         if i == "realestate" or i == "land" or i == "stock":
             iteration = 0
             for item1 in data["assets"][i]:
+                iteration += 1
                 if item1["name"] == name:
                     item = ["assets", i, iteration]
                     break

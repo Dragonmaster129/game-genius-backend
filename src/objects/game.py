@@ -194,6 +194,10 @@ class Game:
                     optionsCard["options"] = ["Buy", "Don't buy"]
                 elif self.currentCard["card"]["type"] == "d2y":
                     optionsCard["options"] = ["Buy", "Don't buy"]
+                elif self.currentCard["card"]["type"] == "royalty":
+                    optionsCard["options"] = ["Buy", "Don't buy"]
+                elif self.currentCard["card"]["type"] == "dividend":
+                    optionsCard["options"] = ["Amount", "Buy", "Don't Buy"]
                 try:
                     if self.currentCard["card"]['type'] == "stock":
                         if self.currentCard["card"]["option"] == "regular":
@@ -203,11 +207,10 @@ class Game:
             except KeyError:
                 if self.currentCard["type"] == "realestate":
                     if self.currentAction == "MARKET":
-                        try:
-                            if self.currentCard["newProperty"]:
-                                optionsCard["options"] = ["Take", "Don't take it"]
-                        except KeyError:
-                            optionsCard["options"] = ["Sell", "Don't Sell"]
+                        optionsCard["options"] = ["Sell all", "Sell", "Don't Sell"]
+                elif self.currentCard["type"] == "realestate Exchange":
+                    if self.currentAction == "MARKET":
+                        optionsCard["options"] = ["Take", "Don't take it"]
         else:
             optionsCard["options"] = ["OK"]
         return optionsCard

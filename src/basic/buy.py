@@ -7,6 +7,8 @@ def buy(card, data, playerAction, amount=1):
         type = card.pop("type")
         if type == "d2y":
             type = "business"
+        if type == "royalty" or type == "dividend":
+            type = "dividends"
         key = len(data["assets"][type])
         if type == "stock":
             card["amount"] = amount
