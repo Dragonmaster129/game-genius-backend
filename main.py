@@ -80,6 +80,13 @@ class GetChoice(GetCard):
     amount: int
 
 
+class GetSellChoice(BaseModel):
+    ID: str
+    gameID: str
+    amount: int
+    sellItem: list
+
+
 tokens = {"1": "test@test.com", "31f29295f838405ca6d9eaa37e287f2f": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
@@ -373,21 +380,12 @@ async def takeCard(IDs: GetChoice):
 
 
 @app.post("/choice/Sell")
-async def sellCard(IDs: GetChoice):
+async def sellCard(IDs: GetSellChoice):
     currentGame = loadCurrentGame(IDs.gameID)
-    if IDs.amount != 0:
-        sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
-        if currentGame.currentCard["name"] == "plex":
-            for i in ["duplex", "4-plex", "8-plex"]:
-                sellItem = currentGame.findFirstValue(i)
-                if sellItem[2] >= 0:
-                    currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, i)
-        try:
-            if sellItem[2] >= 0:
-                currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
-        except KeyError:
-            if sellItem[2] >= 0:
-                currentGame.sellCard(sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount, currentGame.currentCard["name"])
+    try:
+        currentGame.sellCard(IDs.sellItem, currentGame.currentCard["price"], currentGame.currentCard["size"])
+    except KeyError:
+        currentGame.sellCard(IDs.sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount)
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
     else:
@@ -397,7 +395,7 @@ async def sellCard(IDs: GetChoice):
     return playerData
 
 
-@app.post("/choice/Sell")
+@app.post("/choice/Sell All")
 async def sellAllCards(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
@@ -418,14 +416,32 @@ async def shortCard(IDs: GetChoice):
 @app.post("/choice/OK")
 async def OKCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
-    if currentGame.currentAction == "DOODAD":
-        currentGame.doodad(currentGame.currentCard["cash"], currentGame.currentCard["cashflow"], currentGame.currentCard["category"])
-    elif currentGame.currentAction == "BABY":
-        currentGame.getBaby()
-    elif currentGame.currentAction == "DOWNSIZED":
-        currentGame.downsizedCurrentPlayer()
+    try:
+        if currentGame.currentAction == "DOODAD":
+            currentGame.doodad(currentGame.currentCard["cash"], currentGame.currentCard["cashflow"], currentGame.currentCard["category"])
+        elif currentGame.currentAction == "BABY":
+            currentGame.getBaby()
+        elif currentGame.currentAction == "DOWNSIZED":
+            currentGame.downsizedCurrentPlayer()
+        elif currentGame.currentCard["type"] == "Trade Improves/Recession Strikes":
+            currentGame.recessionTradeImproves(currentGame.currentCard["amount"])
+    except KeyError:
+        pass
     if currentGame.currentAction != "STARTTURN":
         currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/sellNegative")
+async def sellNegative(IDs: GetSellChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    email = tokens[IDs.ID]
+    for i in range(len(currentGame.playerList)):
+        if currentGame.playerList[i].playerData["email"] == email:
+            currentGame.currentTarget = i
+    currentGame.sellNegative(IDs.sellItem)
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData

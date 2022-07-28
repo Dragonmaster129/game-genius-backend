@@ -17,18 +17,18 @@ class TestTotalUp(unittest.TestCase):
 
     def test_TotalUpCard2(self):
         self.resetUp()
-        self.data["assets"]["business"].append({"name": "CARD2", "value": 500, "key": 1})
+        self.data["assets"]["business"].append({"name": "card2", "value": 500, "key": 1})
         self.assertEqual(totalUp.totalUp(self.data["assets"]), 14320)
-        self.data["assets"]["business"].append({"name": "CARD1", "cost": 200, "downpay": 200, "key": 2})
+        self.data["assets"]["business"].append({"name": "card1", "cost": 200, "downpay": 200, "key": 2})
         self.assertEqual(totalUp.totalUp(self.data["assets"]), 14820)
 
     def test_TotalUpCard3(self):
         self.resetUp()
-        self.data["assets"]["business"].append({"name": "CARD3", "value": 5000, "key": 1})
+        self.data["assets"]["business"].append({"name": "card3", "value": 5000, "key": 1})
         self.assertEqual(totalUp.totalUp(self.data["assets"]), 14320)
-        self.data["assets"]["business"].append({"name": "CARD1", "cost": 200, "downpay": 200, "key": 2})
+        self.data["assets"]["business"].append({"name": "card1", "cost": 200, "downpay": 200, "key": 2})
         self.assertEqual(totalUp.totalUp(self.data["assets"]), 14320)
-        self.data["assets"]["business"].append({"name": "CARD2", "value": 500, "key": 3})
+        self.data["assets"]["business"].append({"name": "card2", "value": 500, "key": 3})
         self.assertEqual(totalUp.totalUp(self.data["assets"]), 19820)
 
 

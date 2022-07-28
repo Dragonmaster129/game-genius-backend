@@ -1,7 +1,7 @@
 def getCharity(data):
     if data["cash"] >= data["totalIncome"] / 10:
         data["cash"] -= data["totalIncome"] / 10
-        data["charity"] = 3
+        data["charity"] = 4
         return True
     else:
         return False

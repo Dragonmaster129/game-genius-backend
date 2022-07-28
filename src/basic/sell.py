@@ -8,12 +8,17 @@ def sell(itemData, data, playerAction, price, amount=1):
             data["cash"] += (price * exitingData["size"]) - exitingData["mortgage"]
         if itemData[1] == "land":
             exitingData["size"] -= amount
-            data["cash"] += price - exitingData["mortgage"]
-            exitingData.pop("mortgage")
-            exitingData.pop("value")
+            try:
+                data["cash"] += price - exitingData["mortgage"]
+                exitingData.pop("mortgage")
+                exitingData.pop("value")
+            except KeyError:
+                data["cash"] += price
             if exitingData["size"] > 0:
                 data[itemData[0]][itemData[1]].append(exitingData)
         if itemData[1] == "stock":
+            if amount == 0:
+                amount = exitingData["amount"]
             if exitingData["option"] == "REGULAR":
                 data["cash"] += (price * amount)
                 exitingData["amount"] -= amount

@@ -139,7 +139,7 @@ class TestGameplay(unittest.TestCase):
         self.assertEqual(0, self.game.getCurrentPlayerData()["charity"])
         self.assertEqual(3950, self.game.getCurrentPlayerData()["cash"])
         self.game.getCharity()
-        self.assertEqual(3, self.game.getCurrentPlayerData()["charity"])
+        self.assertEqual(4, self.game.getCurrentPlayerData()["charity"])
         self.assertEqual(2630, self.game.getCurrentPlayerData()["cash"])
 
     def test_checkCharity(self):
@@ -149,6 +149,8 @@ class TestGameplay(unittest.TestCase):
 
     def test_charityDecrements(self):
         self.game.getCharity()
+        self.assertEqual(4, self.game.getCurrentPlayerData()["charity"])
+        self.game.charityTurnEnd()
         self.assertEqual(3, self.game.getCurrentPlayerData()["charity"])
         self.game.charityTurnEnd()
         self.assertEqual(2, self.game.getCurrentPlayerData()["charity"])
@@ -192,7 +194,7 @@ class TestGameplay(unittest.TestCase):
         self.game.buyItem(card, 10)
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 950)
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["expenses"]["loan"], 3000)
-        self.game.sellCard(["assets", "realestate", 1], 85000, 1, "STARTERHOUSE")
+        self.game.sellCard(["assets", "realestate", 1], 85000, 1)
         self.assertEqual(self.game.playerList[0].playerData["playerData"]["cash"], 45950)
         self.assertNotIn(card, self.game.playerList[0].playerData["playerData"]["assets"]["realestate"])
 

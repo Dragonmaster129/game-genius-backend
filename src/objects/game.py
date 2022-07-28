@@ -182,13 +182,14 @@ class Game:
             # }
             sellTypes = ["realestate", "stock", "land"]
             if self.currentCard["type"] in sellTypes:
-                self.sellCard(playerOptions[0:2], self.currentCard["price"], playerOptions[3], self.currentCard["name"])
+                self.sellCard(playerOptions[0:2], self.currentCard["price"], playerOptions[3])
         elif self.currentAction == "CAPITALGAIN":
             self.buyItem(self.currentCard["card"], 1)
 
     def sendPlayerTheirOptions(self):
         optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
         if self.currentAction != "DOODAD":
+            print(self.currentCard)
             try:
                 if self.currentCard["card"]["type"] == "realestate":
                     optionsCard["options"] = ["Buy", "Don't buy"]
@@ -204,8 +205,12 @@ class Game:
                     optionsCard["options"] = ["Amount", "Buy", "Don't Buy"]
                 elif self.currentCard["card"]["type"] == "option On Realestate":
                     optionsCard["options"] = ["Get Option", "Don't"]
+                elif self.currentCard["card"]["type"] == "land":
+                    optionsCard["options"] = ["Buy", "Don't buy"]
                 try:
                     if self.currentCard["card"]['type'] == "stock":
+                        optionsCard["type"] = "stock"
+                        optionsCard["name"] = self.currentCard["card"]["name"]
                         if self.currentCard["card"]["option"] == "regular":
                             optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
                 except KeyError:
@@ -213,11 +218,23 @@ class Game:
             except KeyError:
                 if self.currentCard["type"] == "realestate":
                     if self.currentAction == "MARKET":
-                        optionsCard["options"] = ["Sell all", "Sell", "Don't Sell"]
+                        optionsCard["type"] = "realestate"
+                        optionsCard["name"] = self.currentCard["name"]
+                        optionsCard["options"] = ["Sell", "Don't Sell"]
                 elif self.currentCard["type"] == "realestate Exchange":
                     if self.currentAction == "MARKET":
                         optionsCard["options"] = ["Take", "Don't take it"]
                         self.checkOptions()
+                elif self.currentCard["type"] == "stock":
+                    optionsCard["type"] = "stock"
+                    optionsCard["name"] = self.currentCard["name"]
+                    optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
+                elif self.currentCard["type"] == "land":
+                    optionsCard["type"] = "land"
+                    optionsCard["name"] = "LAND"
+                    optionsCard["options"] = ["Sell", "Do nothing"]
+                elif self.currentCard["type"] == "Trade Improves/Recession Strikes":
+                    optionsCard["options"] = ["OK"]
         else:
             optionsCard["options"] = ["OK"]
         self.sendMsgToCurrentTarget(optionsCard)
@@ -309,14 +326,17 @@ class Game:
         payLoan.payLoan(self.playerList[self.currentTurn].playerData["playerData"], amount)
         self.updateData()
 
-    def sellCard(self, itemData, price, amount, sellType):
-        try:
-            if (self.playerList[self.currentTarget]
-                    .playerData["playerData"][itemData[0]][itemData[1]][itemData[2]-1]["name"]) == sellType:
-                sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
-        except KeyError:
-            pass
+    def sellCard(self, itemData, price, amount):
+        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
         # itemData, data, playerAction, price, amount
+
+    def sellNegative(self, itemData):
+        itemD = self.playerList[self.currentTarget].playerData["playerData"]["assets"]["realestate"][itemData[2]-1]
+        price = itemD["downpay"] / 2
+        price += itemD["mortgage"]
+        price = price / itemD["size"]
+        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], price, 1)
+        self.updateData()
 
     def forcedSaleAll(self, cardType, price):
         for player1 in self.playerList:
@@ -363,6 +383,12 @@ class Game:
         for players in self.playerList:
             recessionTradeImproves.recessionTradeImproves(players.playerData["playerData"], amount)
         self.updateData()
+        self.checkNegative()
+
+    def checkNegative(self):
+        for players in self.playerList:
+            msg = {"NEGATIVE": recessionTradeImproves.checkNegative(players.playerData["playerData"])}
+            players.sendMsg(msg)
 
     def REUpgrade(self, changeTo, requiredType, changing=None):
         REUpgrade.upgrade(changeTo, self.playerList[self.currentTarget].playerData["playerData"],
