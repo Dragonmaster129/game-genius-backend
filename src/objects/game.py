@@ -241,19 +241,20 @@ class Game:
             optionsCard["options"] = ["OK"]
         self.sendMsgToCurrentTarget(optionsCard)
 
+
     def sendPlayerCharityOptions(self):
         optionsCard = {"description": "Charity costs 10% of your total income", "title": "Donate to Charity",
                        "options": ["Give", "Don't"]}
-        return optionsCard
+        self.sendMsgToCurrentTarget(optionsCard)
 
     def sendPlayerBabyOptions(self):
         optionsCard = {"description": "Add a child to your game card", "title": "You got a Baby!", "options": ["OK"]}
-        return optionsCard
+        self.sendMsgToCurrentTarget(optionsCard)
 
     def sendPlayerDownsizedOptions(self):
         optionsCard = {"description": "Lose two turns and pay your expenses", "title": "Your company downsized",
                        "options": ["OK"]}
-        return optionsCard
+        self.sendMsgToCurrentTarget(optionsCard)
 
     def saveData(self, collection=None):
         if collection is None:
@@ -281,11 +282,11 @@ class Game:
             self.charityTurnEnd()
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
         self.currentTarget = copy.deepcopy(self.currentTurn)
-        if self.currentAction != "BEGINNING":
-            self.sendMsgToCurrentPlayer({"EVENT": "STARTTURN"})
         if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()
+        elif self.currentAction != "BEGINNING":
+            self.sendMsgToCurrentPlayer({"EVENT": "STARTTURN"})
 
     def resetTarget(self):
         self.currentTarget = copy.deepcopy(self.currentTurn)

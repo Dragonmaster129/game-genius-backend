@@ -14,6 +14,8 @@ class Player:
             message.pop("_id")
         except KeyError:
             pass
+        except AttributeError:
+            pass
         asyncio.create_task(self.socket.send_text(json.dumps(message)))
 
     def saveData(self, collection=None):
