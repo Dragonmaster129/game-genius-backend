@@ -235,6 +235,8 @@ class Game:
                     optionsCard["options"] = ["Sell", "Do nothing"]
                 elif self.currentCard["type"] == "Trade Improves/Recession Strikes":
                     optionsCard["options"] = ["OK"]
+                elif self.currentCard["type"] == "Insurance":
+                    optionsCard["options"] = ["Insure", "Don't"]
         else:
             optionsCard["options"] = ["OK"]
         self.sendMsgToCurrentTarget(optionsCard)
@@ -327,7 +329,7 @@ class Game:
         self.updateData()
 
     def sellCard(self, itemData, price, amount):
-        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
+        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], not self.checkInsurance(), price, amount)
         # itemData, data, playerAction, price, amount
 
     def sellNegative(self, itemData):

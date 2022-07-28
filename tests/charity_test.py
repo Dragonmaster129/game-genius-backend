@@ -16,10 +16,10 @@ class TestCharity(unittest.TestCase):
         self.assertEqual(self.data["charity"], 0)
         res = charity.getCharity(self.data)
         self.assertEqual(res, True)
-        self.assertEqual(self.data["charity"], 3)
+        self.assertEqual(self.data["charity"], 4)
         res = charity.turnEnd(self.data)
         self.assertEqual(res, True)
-        self.assertEqual(self.data["charity"], 2)
+        self.assertEqual(self.data["charity"], 3)
 
     def test_cannotGetCharityWithNoMoney(self):
         self.data["cash"] = 0

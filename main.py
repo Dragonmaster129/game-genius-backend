@@ -467,6 +467,16 @@ async def GiveCard(IDs: GetChoice):
     return playerData
 
 
+@app.post("/choice/Insure")
+async def insurePlayer(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.getInsurance(currentGame.currentCard["cost"])
+    currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
 @app.websocket("/joinGame")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
