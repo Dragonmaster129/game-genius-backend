@@ -277,8 +277,8 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("CAPITALGAIN")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = currentGame.sendPlayerTheirOptions()
-    return currentCard
+    currentGame.sendPlayerTheirOptions()
+    return True
 
 
 @app.post("/cashflow")
@@ -287,8 +287,8 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("CASHFLOW")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = currentGame.sendPlayerTheirOptions()
-    return currentCard
+    currentGame.sendPlayerTheirOptions()
+    return True
 
 
 @app.post("/doodad")
@@ -297,8 +297,8 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("DOODAD")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = currentGame.sendPlayerTheirOptions()
-    return currentCard
+    currentGame.sendPlayerTheirOptions()
+    return True
 
 
 @app.post("/market")
@@ -307,8 +307,8 @@ async def capitalGain(IDs: GetCard):
     currentGame.changeAction("MARKET")
     currentGame.drawCard()
     currentGame.saveData()
-    currentCard = currentGame.sendPlayerTheirOptions()
-    return currentCard
+    currentGame.sendPlayerTheirOptions()
+    return True
 
 
 @app.post("/charity")
@@ -397,6 +397,12 @@ async def sellCard(IDs: GetChoice):
     return playerData
 
 
+@app.post("/choice/Sell")
+async def sellAllCards(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
+
+
 @app.post("/choice/Short")
 async def shortCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
@@ -420,6 +426,16 @@ async def OKCard(IDs: GetChoice):
         currentGame.downsizedCurrentPlayer()
     if currentGame.currentAction != "STARTTURN":
         currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Get Option")
+async def getOptionOnRealEstate(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.getOption()
+    currentGame.changeAction("MARKET")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData

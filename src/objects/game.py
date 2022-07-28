@@ -192,6 +192,7 @@ class Game:
             try:
                 if self.currentCard["card"]["type"] == "realestate":
                     optionsCard["options"] = ["Buy", "Don't buy"]
+                    self.checkOptions()
                 elif self.currentCard["card"]["type"] == "d2y":
                     if self.currentCard["card"]["name"] == "CARD1":
                         optionsCard["options"] = ["Buy", "Don't buy"]
@@ -201,6 +202,8 @@ class Game:
                     optionsCard["options"] = ["Buy", "Don't buy"]
                 elif self.currentCard["card"]["type"] == "dividend":
                     optionsCard["options"] = ["Amount", "Buy", "Don't Buy"]
+                elif self.currentCard["card"]["type"] == "option On Realestate":
+                    optionsCard["options"] = ["Get Option", "Don't"]
                 try:
                     if self.currentCard["card"]['type'] == "stock":
                         if self.currentCard["card"]["option"] == "regular":
@@ -214,9 +217,10 @@ class Game:
                 elif self.currentCard["type"] == "realestate Exchange":
                     if self.currentAction == "MARKET":
                         optionsCard["options"] = ["Take", "Don't take it"]
+                        self.checkOptions()
         else:
             optionsCard["options"] = ["OK"]
-        return optionsCard
+        self.sendMsgToCurrentTarget(optionsCard)
 
     def sendPlayerCharityOptions(self):
         optionsCard = {"description": "Charity costs 10% of your total income", "title": "Donate to Charity",
@@ -363,6 +367,21 @@ class Game:
     def REUpgrade(self, changeTo, requiredType, changing=None):
         REUpgrade.upgrade(changeTo, self.playerList[self.currentTarget].playerData["playerData"],
                           requiredType, changing)
+
+    def getOption(self):
+        if self.playerList[self.currentTurn].playerData["playerData"]["cash"] >= self.currentCard["price"]:
+            self.playerList[self.currentTurn].playerData["playerData"]["cash"] -= self.currentCard["price"]
+            self.playerList[self.currentTurn].playerData["playerData"]["optionOnRealestate"] = time.time()
+
+    def checkOptions(self):
+        timeStamps = [time.time(), -1]
+        for i in range(len(self.playerList)):
+            optionOnRealestate = self.playerList[i].playerData["playerData"]["optionOnRealestate"]
+            if optionOnRealestate:
+                if optionOnRealestate < timeStamps[0]:
+                    timeStamps = [optionOnRealestate, i]
+        if timeStamps[1] != -1:
+            self.currentTarget = timeStamps[1]
 
     def checkBaby(self):
         return checkBaby.checkBaby(self.playerList[self.currentTarget].playerData["playerData"])
