@@ -5,6 +5,8 @@ import math
 def buy(card, data, playerAction, amount=1):
     if playerAction:
         type = card.pop("type")
+        if type == "d2y":
+            type = "business"
         key = len(data["assets"][type])
         if type == "stock":
             card["amount"] = amount

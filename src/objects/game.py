@@ -191,11 +191,11 @@ class Game:
         if self.currentAction != "DOODAD":
             try:
                 if self.currentCard["card"]["type"] == "realestate":
-                        optionsCard["options"] = ["Buy", "Don't buy"]
-
+                    optionsCard["options"] = ["Buy", "Don't buy"]
+                elif self.currentCard["card"]["type"] == "d2y":
+                    optionsCard["options"] = ["Buy", "Don't buy"]
                 try:
                     if self.currentCard["card"]['type'] == "stock":
-                        print(self.currentCard)
                         if self.currentCard["card"]["option"] == "regular":
                             optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
                 except KeyError:
@@ -215,6 +215,15 @@ class Game:
     def sendPlayerCharityOptions(self):
         optionsCard = {"description": "Charity costs 10% of your total income", "title": "Donate to Charity",
                        "options": ["Give", "Don't"]}
+        return optionsCard
+
+    def sendPlayerBabyOptions(self):
+        optionsCard = {"description": "Add a child to your game card", "title": "You got a Baby!", "options": ["OK"]}
+        return optionsCard
+
+    def sendPlayerDownsizedOptions(self):
+        optionsCard = {"description": "Lose two turns and pay your expenses", "title": "Your company downsized",
+                       "options": ["OK"]}
         return optionsCard
 
     def saveData(self, collection=None):
@@ -239,6 +248,8 @@ class Game:
         self.sendSaveEventToPlayers()
 
     def nextTurn(self):
+        if self.checkCharity():
+            self.charityTurnEnd()
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
         self.currentTarget = copy.deepcopy(self.currentTurn)
         if self.currentAction != "BEGINNING":

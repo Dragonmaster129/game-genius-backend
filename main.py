@@ -325,7 +325,8 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("BABY")
     currentGame.saveData()
-    return {"EVENT": "Got baby"}
+    currentCard = currentGame.sendPlayerBabyOptions()
+    return currentCard
 
 
 @app.post("/downsized")
@@ -333,13 +334,15 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("DOWNSIZED")
     currentGame.saveData()
-    return {"EVENT": "Got downsized"}
+    currentCard = currentGame.sendPlayerDownsizedOptions()
+    return currentCard
 
 
 @app.post("/end-turn")
 async def endTurn(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.nextTurn()
+    currentGame.saveData()
     return {"EVENT": "ENDTURN"}
 
 
@@ -377,11 +380,14 @@ async def sellCard(IDs: GetChoice):
         if currentGame.currentCard["name"] == "plex":
             for i in ["duplex", "4-plex", "8-plex"]:
                 sellItem = currentGame.findFirstValue(i)
-                currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
+                if sellItem[2] >= 0:
+                    currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, i)
         try:
-            currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
+            if sellItem[2] >= 0:
+                currentGame.sellCard(sellItem, currentGame.currentCard["price"], IDs.amount, currentGame.currentCard["name"])
         except KeyError:
-            currentGame.sellCard(sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount, currentGame.currentCard["name"])
+            if sellItem[2] >= 0:
+                currentGame.sellCard(sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount, currentGame.currentCard["name"])
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
     else:
@@ -408,6 +414,11 @@ async def OKCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     if currentGame.currentAction == "DOODAD":
         currentGame.doodad(currentGame.currentCard["cash"], currentGame.currentCard["cashflow"], currentGame.currentCard["category"])
+    elif currentGame.currentAction == "BABY":
+        currentGame.getBaby()
+    elif currentGame.currentAction == "DOWNSIZED":
+        currentGame.downsizedCurrentPlayer()
+    if currentGame.currentAction != "STARTTURN":
         currentGame.changeAction("ENDTURN")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
@@ -431,7 +442,6 @@ async def websocket_endpoint(websocket: WebSocket):
         res = await websocket.receive_text()
         # await websocket.send_text(f"Message text was: {res}")
         res = json.loads(res)
-        # print(res)
         websockets[tokens[res[0]]] = websocket
         db["player"].update_one({"ID": tokens[res[0]]}, {"$set": {"gameID": res[1]}})
         resetPlayer.initializePlayerData(tokens[res[0]])

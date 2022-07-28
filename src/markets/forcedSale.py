@@ -52,10 +52,12 @@ def findFirstIteration(data, name):
     for i in data["assets"]:
         if i == "realestate" or i == "land" or i == "stock":
             iteration = 0
-            for item in data["assets"][i]:
-                if item["name"] == name:
+            for item1 in data["assets"][i]:
+                if item1["name"] == name:
                     item = ["assets", i, iteration]
                     break
         if item != [""]:
             break
+    if item == [""]:
+        return ["", "", -1]
     return item
