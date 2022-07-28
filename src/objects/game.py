@@ -193,7 +193,10 @@ class Game:
                 if self.currentCard["card"]["type"] == "realestate":
                     optionsCard["options"] = ["Buy", "Don't buy"]
                 elif self.currentCard["card"]["type"] == "d2y":
-                    optionsCard["options"] = ["Buy", "Don't buy"]
+                    if self.currentCard["card"]["name"] == "CARD1":
+                        optionsCard["options"] = ["Buy", "Don't buy"]
+                    else:
+                        optionsCard["options"] = ["Buy"]
                 elif self.currentCard["card"]["type"] == "royalty":
                     optionsCard["options"] = ["Buy", "Don't buy"]
                 elif self.currentCard["card"]["type"] == "dividend":

@@ -9,14 +9,14 @@ def totalUp(objToTotal):
                 card1 = False
                 card2 = False
                 for iteration in objToTotal[baseKey]:
-                    if iteration["name"] == "CARD1":
+                    if iteration["name"] == "card1":
                         card1 = True
-                    if iteration["name"] == "CARD2":
+                    if iteration["name"] == "card2":
                         card2 = True
                 for iteration in objToTotal[baseKey]:
-                    if iteration["name"] == "CARD2" and card1:
+                    if iteration["name"] == "card2" and card1:
                         total += iteration["value"]
-                    if iteration["name"] == "CARD3" and card1 and card2:
+                    if iteration["name"] == "card3" and card1 and card2:
                         total += iteration["value"]
             else:
                 try:
