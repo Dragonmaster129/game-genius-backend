@@ -222,7 +222,7 @@ async def createGame(Game: CreateGame):
         "name": Game.name,
         "ID": gameID,
         "timeStamp": time.time(),
-        "playerList": [tokens[Game.player]],
+        "playerList": [],
         "currentAction": "STARTGAME",
         "currentCard": {},
         "currentTarget": 0,
