@@ -22,3 +22,19 @@ def pollution(data, payFiftyK=False):
                         highest = [iteration, item["value"]]
                         iteration += 1
         data["assets"]["realestate"].pop(highest[0])
+
+
+def checkPollution(data):
+    highest = ["", 0]
+    for i in data["assets"]:
+        if i == "realestate":
+            iteration = 0
+            for item in data["assets"][i]:
+                try:
+                    if item["value"] > highest[2]:
+                        highest = [i, iteration, item["value"]]
+                    iteration += 1
+                except IndexError:
+                    highest = [i, iteration, item["value"]]
+                    iteration += 1
+    return highest != ["", 0]

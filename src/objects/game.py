@@ -189,7 +189,6 @@ class Game:
     def sendPlayerTheirOptions(self):
         optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
         if self.currentAction != "DOODAD":
-            print(self.currentCard)
             try:
                 if self.currentCard["card"]["type"] == "realestate":
                     optionsCard["options"] = ["Buy", "Don't buy"]
@@ -239,8 +238,23 @@ class Game:
                     optionsCard["options"] = ["Insure", "Don't"]
         else:
             optionsCard["options"] = ["OK"]
-        self.sendMsgToCurrentTarget(optionsCard)
-
+        try:
+            if self.currentCard["target"] == "you":
+                self.currentTarget = copy.deepcopy(self.currentTurn)
+                self.sendMsgToCurrentTarget(optionsCard)
+            elif self.currentCard["target"] == "right":
+                self.currentTarget = copy.deepcopy((self.currentTurn - 1) % len(self.playerList))
+                self.sendMsgToCurrentTarget(optionsCard)
+            elif self.currentCard["target"] == "all":
+                self.sendMsgToAllPlayers(optionsCard)
+            elif self.currentCard["target"] == "playerToRightAll":
+                for i in range(len(self.playerList)):
+                    if self.currentCard["type"] == "Pollution Found":
+                        if pollution.checkPollution(self.playerList[self.currentTurn - i - 1].playerData["playerData"]):
+                            self.currentTarget = self.currentTurn - i - 1
+                            self.sendMsgToCurrentTarget(optionsCard)
+        except KeyError:
+            self.sendMsgToCurrentTarget(optionsCard)
 
     def sendPlayerCharityOptions(self):
         optionsCard = {"description": "Charity costs 10% of your total income", "title": "Donate to Charity",

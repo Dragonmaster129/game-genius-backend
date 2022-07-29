@@ -17,6 +17,7 @@ def initializePlayerData(email, initialData=None):
                 break
         initialData = initData.getInitData(random.choice(List))
     players = db["player"]
+    initialData["player"] = email
     players.update_one({"email": email}, {"$set": {"playerData": initialData}})
 
 

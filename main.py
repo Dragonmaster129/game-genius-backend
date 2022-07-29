@@ -94,7 +94,7 @@ class GetLoanChoice(BaseModel):
     amount: int
 
 
-tokens = {"1": "test@test.com", "31f29295f838405ca6d9eaa37e287f2f": "test@test.com"}
+tokens = {"1": "test@test.com", "59659e85a8a640de9b8182d0753642f1": "test1@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
 professions = []
@@ -511,6 +511,9 @@ async def websocket_endpoint(websocket: WebSocket):
         # await websocket.send_text(f"Message text was: {res}")
         res = json.loads(res)
         websockets[tokens[res[0]]] = websocket
+        playerList = db["game"].find({"ID": res[1]})[0]["playerList"]
+        playerList.append(tokens[res[0]])
+        db["game"].update_one({"ID": res[1]}, {"$set": {"playerList": playerList}})
         db["player"].update_one({"ID": tokens[res[0]]}, {"$set": {"gameID": res[1]}})
         resetPlayer.initializePlayerData(tokens[res[0]])
 
