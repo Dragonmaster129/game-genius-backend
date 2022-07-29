@@ -215,7 +215,9 @@ class Game:
                 except KeyError:
                     print(self.currentCard)
             except KeyError:
-                if self.currentCard["type"] == "realestate":
+                if self.currentCard["type"] == "realestate deal":
+                    optionsCard["options"] = ["Buy", "Don't buy"]
+                elif self.currentCard["type"] == "realestate sell":
                     if self.currentAction == "MARKET":
                         optionsCard["type"] = "realestate"
                         optionsCard["name"] = self.currentCard["name"]
@@ -236,6 +238,8 @@ class Game:
                     optionsCard["options"] = ["OK"]
                 elif self.currentCard["type"] == "Insurance":
                     optionsCard["options"] = ["Insure", "Don't"]
+                elif self.currentCard["type"] == "Natural Disaster":
+                    optionsCard["options"] = ["OK"]
         else:
             optionsCard["options"] = ["OK"]
         try:
@@ -245,6 +249,8 @@ class Game:
             elif self.currentCard["target"] == "right":
                 self.currentTarget = copy.deepcopy((self.currentTurn - 1) % len(self.playerList))
                 self.sendMsgToCurrentTarget(optionsCard)
+                optionsCard["options"] = ["Card goes to player on right"]
+                self.sendMsgToCurrentPlayer(optionsCard)
             elif self.currentCard["target"] == "all":
                 self.sendMsgToAllPlayers(optionsCard)
             elif self.currentCard["target"] == "playerToRightAll":

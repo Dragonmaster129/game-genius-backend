@@ -95,7 +95,7 @@ class GetLoanChoice(BaseModel):
 
 
 tokens = {"1": "test@test.com", "59659e85a8a640de9b8182d0753642f1": "test1@test.com"}
-authTokens = {"1": "test@test.com"}
+authTokens = {"1": "test@test.com", "59659e85a8a640de9b8182d0753642f1": "test1@test.com"}
 websockets = {}
 professions = []
 temps = db["initialData"]
@@ -239,6 +239,17 @@ async def createGame(Game: CreateGame):
 
 @app.post("/login")
 async def login(request: LoginData):
+    time.sleep(1)
+    if playerLogin.login(request.email, request.password):
+        token = uuid.uuid4().hex
+        tokens[token] = request.email
+        return json.dumps([token, 0])
+    else:
+        return False
+
+
+@app.post("/auth")
+async def auth(request: LoginData):
     time.sleep(1)
     if playerLogin.login(request.email, request.password):
         token = uuid.uuid4().hex
