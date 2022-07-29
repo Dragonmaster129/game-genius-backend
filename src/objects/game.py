@@ -286,7 +286,21 @@ class Game:
             self.sendMsgToCurrentPlayer("SKIPPED")
             self.nextTurn()
         elif self.currentAction != "BEGINNING":
+            self.sendMsgToAllPlayers({"EVENT": "OTHERPLAYERSTURN"})
             self.sendMsgToCurrentPlayer({"EVENT": "STARTTURN"})
+
+    def getLiabilities(self):
+        expenses = {}
+        allExpenses = self.playerList[self.currentTarget].playerData["playerData"]["expenses"]
+        for i in allExpenses:
+            if i not in ["other", "taxes", "insurance", "child"]:
+                if i != "loan":
+                    if allExpenses[i][0]["totalCost"] > 0:
+                        expenses[i] = allExpenses[i]
+                else:
+                    if allExpenses[i] > 0:
+                        expenses[i] = allExpenses[i]
+        return expenses
 
     def resetTarget(self):
         self.currentTarget = copy.deepcopy(self.currentTurn)
@@ -325,8 +339,11 @@ class Game:
         paycheck.paycheck(self.playerList[self.currentTurn].playerData["playerData"])
         self.updateData()
 
-    def payBackLoan(self, amount=1000):
-        payLoan.payLoan(self.playerList[self.currentTurn].playerData["playerData"], amount)
+    def payBackLoan(self, loanType, amount=1000):
+        if loanType == "loan":
+            payLoan.payLoan(self.playerList[self.currentTarget].playerData["playerData"], amount)
+        else:
+            payLoan.payNotBankLoan(self.playerList[self.currentTarget].playerData["playerData"], loanType)
         self.updateData()
 
     def sellCard(self, itemData, price, amount):

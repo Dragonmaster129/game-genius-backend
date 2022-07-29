@@ -87,6 +87,13 @@ class GetSellChoice(BaseModel):
     sellItem: list
 
 
+class GetLoanChoice(BaseModel):
+    ID: str
+    gameID: str
+    loanType: str
+    amount: int
+
+
 tokens = {"1": "test@test.com", "31f29295f838405ca6d9eaa37e287f2f": "test@test.com"}
 authTokens = {"1": "test@test.com"}
 websockets = {}
@@ -351,6 +358,25 @@ async def endTurn(IDs: GetCard):
     currentGame.nextTurn()
     currentGame.saveData()
     return {"EVENT": "ENDTURN"}
+
+
+@app.post("/pay-back-loan")
+async def payBackLoan(IDs: GetCard):
+    currentGame = loadCurrentGame(IDs.gameID)
+    email = tokens[IDs.ID]
+    for i in range(len(currentGame.playerList)):
+        if currentGame.playerList[i].playerData["email"] == email:
+            currentGame.currentTarget = i
+    return currentGame.getLiabilities()
+
+
+@app.post("/pay-for-loan")
+async def payForLoan(ID: GetLoanChoice):
+    currentGame = loadCurrentGame(ID.gameID)
+    currentGame.payBackLoan(ID.loanType, ID.amount)
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[ID.ID])["playerData"]
+    return playerData
 
 
 @app.post("/choice/Buy")
