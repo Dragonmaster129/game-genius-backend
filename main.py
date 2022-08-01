@@ -95,8 +95,8 @@ class GetLoanChoice(BaseModel):
     amount: int
 
 
-tokens = {"1": "test@test.com", "8f51ceba0e9e431ebb66aa152ed5a53d": "test1@test.com"}
-authTokens = {"1": "test@test.com", "8f51ceba0e9e431ebb66aa152ed5a53d": "test1@test.com"}
+tokens = {}
+authTokens = {}
 websockets = {}
 professions = []
 temps = db["initialData"]
