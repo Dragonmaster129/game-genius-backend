@@ -16,6 +16,8 @@ def initializePlayerData(email, initialData=None):
             except IndexError:
                 break
         initialData = initData.getInitData(random.choice(List))
+    else:
+        initialData = initData.getInitData(initialData)
     players = db["player"]
     initialData["player"] = email
     players.update_one({"email": email}, {"$set": {"playerData": initialData}})

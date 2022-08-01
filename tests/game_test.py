@@ -177,7 +177,7 @@ class TestGameplay(unittest.TestCase):
         self.game.borrowALoan(1000)
         self.assertEqual(self.game.getCurrentPlayerData()["cash"], 4950)
         self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 1000)
-        self.game.payBackLoan()
+        self.game.payBackLoan("loan")
         self.assertEqual(self.game.getCurrentPlayerData()["cash"], 3950)
         self.assertEqual(self.game.getCurrentPlayerData()["expenses"]["loan"], 0)
 
@@ -485,6 +485,12 @@ def suite():
 # Change the name to the name of the file dropping the .py
 if __name__ == "game_test":
     runner = unittest.TextTestRunner()
+    resetPlayer.initializePlayerData("test1@test.com", "Doctor")
+    resetPlayer.initializePlayerData("test2@test.com", "Doctor")
+    resetPlayer.initializePlayerData("test3@test.com", "Doctor")
+    resetPlayer.initializePlayerData("test4@test.com", "Doctor")
+    resetPlayer.initializePlayerData("test5@test.com", "Doctor")
+    resetPlayer.initializePlayerData("test6@test.com", "Doctor")
     db = mongoClient.client("cashflowDB")["game"]
     Game = db.find({"ID": 10})
     try:

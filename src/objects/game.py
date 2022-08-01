@@ -367,7 +367,7 @@ class Game:
         self.updateData()
 
     def sellCard(self, itemData, price, amount):
-        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], not self.checkInsurance(), price, amount)
+        sell.sell(itemData, self.playerList[self.currentTarget].playerData["playerData"], True, price, amount)
         # itemData, data, playerAction, price, amount
 
     def sellNegative(self, itemData):

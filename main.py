@@ -9,7 +9,8 @@ import threading
 
 from sampledata import data
 from pydantic import BaseModel
-from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard, deleteCard, updateCard
+from mongoConnection import playerLogin, getPlayerData, resetPlayer, mongoClient, createCard, deleteCard, \
+    updateCard, createUser
 from src.objects import game
 # from src import totalUp
 
@@ -94,8 +95,8 @@ class GetLoanChoice(BaseModel):
     amount: int
 
 
-tokens = {"1": "test@test.com", "59659e85a8a640de9b8182d0753642f1": "test1@test.com"}
-authTokens = {"1": "test@test.com", "59659e85a8a640de9b8182d0753642f1": "test1@test.com"}
+tokens = {"1": "test@test.com", "11ed000242d24714b6a4149a0442987a": "test1@test.com"}
+authTokens = {"1": "test@test.com", "11ed000242d24714b6a4149a0442987a": "test1@test.com"}
 websockets = {}
 professions = []
 temps = db["initialData"]
@@ -208,13 +209,11 @@ async def getGames():
         i.pop("_id")
         newGameList.append(i)
     newGameList.reverse()
-    # TODO sort through the data and return a list
     return newGameList
 
 
 @app.post("/create-game")
 async def createGame(Game: CreateGame):
-    # TODO get the data and create the game
     # choose the ID randomly and create a player list. Append the players to the player list and
     # have the player list at the start have the number of players that it is limited to.
     gameID = uuid.uuid4().hex
@@ -247,6 +246,14 @@ async def login(request: LoginData):
     else:
         return False
 
+
+@app.post("/signup")
+async def signup(request: LoginData):
+    time.sleep(1)
+    player = createUser.createUser(request.email, request.password)
+    if player == "Email Duplicate":
+        return 1
+    return 2
 
 @app.post("/auth")
 async def auth(request: LoginData):
