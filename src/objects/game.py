@@ -123,7 +123,7 @@ class Game:
         elif self.currentAction == "CAPITALGAIN":
             self.capitalOrder = copy.deepcopy(List)
         elif self.currentAction == "MARKET":
-            self.marketOrder = copy.deepcopy(List)
+            self.marketOrder = copy.deepcopy(List[0: 25])
         elif self.currentAction == "BEGINNING":
             self.beginningOrder = copy.deepcopy(List)
 
@@ -158,36 +158,10 @@ class Game:
             playerOptions = {}
         if self.currentAction == "BEGINNING":
             self.playerList[self.currentTurn].addBeginningCard(self.currentCard)
-        elif self.currentAction == "DOODAD":
-            self.doodad(cash=playerOptions["cash"], cashflow=playerOptions["cashflow"],
-                        category=playerOptions["category"])
-        elif self.currentAction == "MARKET":
-            # market = {
-            #     "title": str,  # The bold words at the top of the card
-            #     "description": str,  # exactly what is on the card telling you what to do
-            #     "type": str,  # eg. realestate, stock, land, business, dividend, insurance, child marries, (CONTINUED.)
-            #     # pollution, natural disaster, CHARITY, mentor
-            #     "name": str,  # eg. MYT4U, OK4U, 4-PLEX, STARTERHOUSE, APARTMENTCOMPLEX, ALL. What card affects
-            #     "highest": bool,  # when realestate, affects the highest value of property
-            #     "price": int or str,
-            #     # eg. the stock price, what you are selling realestate for per unit, land. (CONTINUED.)
-            #     # when child marries pay amount.
-            #     "bankrupt": bool,  # eg. stock fails, lose all shares
-            #     "size": int,  # in land, selling 5 acres or 10 acres
-            #     "value": int,  # in spare time co, you get a $7000 value, foreign trade and recession will have this too
-            #     "property": object,  # exchange deals, your starter house changes to 4-PLEX, record these new numbers.
-            #     "forcedSale": bool,  # You have no choice but to sell.
-            #     "target": str,
-            #     # eg. Player, player your right, everyone, right all, starts with you and moves to the right.
-            # }
-            sellTypes = ["realestate", "stock", "land"]
-            if self.currentCard["type"] in sellTypes:
-                self.sellCard(playerOptions[0:2], self.currentCard["price"], playerOptions[3])
-        elif self.currentAction == "CAPITALGAIN":
-            self.buyItem(self.currentCard["card"], 1)
 
     def sendPlayerTheirOptions(self):
         optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
+        print(self.currentCard)
         if self.currentAction != "DOODAD":
             try:
                 if self.currentCard["card"]["type"] == "realestate":
@@ -206,6 +180,8 @@ class Game:
                     optionsCard["options"] = ["Get Option", "Don't"]
                 elif self.currentCard["card"]["type"] == "land":
                     optionsCard["options"] = ["Buy", "Don't buy"]
+                elif self.currentCard["card"]["type"] == "realestate deal":
+                    optionsCard["options"] = ["Buy", "Don't buy"]
                 try:
                     if self.currentCard["card"]['type'] == "stock":
                         optionsCard["type"] = "stock"
@@ -217,6 +193,8 @@ class Game:
             except KeyError:
                 if self.currentCard["type"] == "realestate deal":
                     optionsCard["options"] = ["Buy", "Don't buy"]
+                elif self.currentCard["type"] == "d2y":
+                    optionsCard["options"] = ["Buy"]
                 elif self.currentCard["type"] == "realestate sell":
                     if self.currentAction == "MARKET":
                         optionsCard["type"] = "realestate"
@@ -240,6 +218,8 @@ class Game:
                     optionsCard["options"] = ["Insure", "Don't"]
                 elif self.currentCard["type"] == "Natural Disaster":
                     optionsCard["options"] = ["OK"]
+                elif self.currentCard["type"] == "Pollution Found":
+                    optionsCard["options"] = ["Pay", "Lose"]
         else:
             optionsCard["options"] = ["OK"]
         try:
@@ -257,8 +237,11 @@ class Game:
                 for i in range(len(self.playerList)):
                     if self.currentCard["type"] == "Pollution Found":
                         if pollution.checkPollution(self.playerList[self.currentTurn - i - 1].playerData["playerData"]):
-                            self.currentTarget = self.currentTurn - i - 1
+                            if insurance.checkInsurance(self.playerList[self.currentTurn - i - 1].playerData["playerData"]):
+                                optionsCard["options"] = ["Insured"]
                             self.sendMsgToCurrentTarget(optionsCard)
+                            break
+                        self.currentTarget = self.currentTurn - i - 1
         except KeyError:
             self.sendMsgToCurrentTarget(optionsCard)
 
@@ -403,20 +386,7 @@ class Game:
         return insurance.checkInsurance(self.playerList[self.currentTarget].playerData["playerData"])
 
     def pollutionHitsPLayerToRightAll(self, payTheFiftyK=None):
-        while True:
-            self.currentTarget = (self.currentTarget + 1) % len(self.playerList)
-            try:
-                if self.playerList[self.currentTarget].playerData["playerData"]["assets"]["realestate"][0]:
-                    if not insurance.checkInsurance(self.playerList[self.currentTarget].playerData["playerData"]):
-                        if payTheFiftyK is None:
-                            self.sendMsgToCurrentTarget("Select to pay $50000 or to lose property")
-                        pollution.pollution(self.playerList[self.currentTarget].playerData["playerData"], payTheFiftyK)
-                        break
-                    elif insurance.checkInsurance(self.playerList[self.currentTarget].playerData["playerData"]):
-                        break
-            except IndexError:
-                if self.currentTarget == self.currentTurn:
-                    break
+        pollution.pollution(self.playerList[self.currentTarget].playerData["playerData"], payTheFiftyK)
         self.updateData()
 
     def recessionTradeImproves(self, amount=30):

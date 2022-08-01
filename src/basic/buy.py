@@ -5,10 +5,16 @@ import math
 def buy(card, data, playerAction, amount=1):
     if playerAction:
         type = card.pop("type")
+        try:
+            card.pop("_id")
+        except KeyError:
+            pass
         if type == "d2y":
             type = "business"
         if type == "royalty" or type == "dividend":
             type = "dividends"
+        if type == "realestate deal":
+            type = "realestate"
         key = len(data["assets"][type])
         if type == "stock":
             card["amount"] = amount

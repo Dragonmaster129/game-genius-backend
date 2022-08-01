@@ -402,7 +402,10 @@ async def payForLoan(ID: GetLoanChoice):
 @app.post("/choice/Buy")
 async def buyCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
-    currentGame.buyItem(currentGame.currentCard["card"], IDs.amount)
+    try:
+        currentGame.buyItem(currentGame.currentCard["card"], IDs.amount)
+    except KeyError:
+        currentGame.buyItem(currentGame.currentCard, IDs.amount)
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
     else:
@@ -507,6 +510,26 @@ async def GiveCard(IDs: GetChoice):
 async def insurePlayer(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.getInsurance(currentGame.currentCard["cost"])
+    currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Pay")
+async def pay50K(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.pollutionHitsPLayerToRightAll(True)
+    currentGame.changeAction("ENDTURN")
+    currentGame.saveData()
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
+    return playerData
+
+
+@app.post("/choice/Lose")
+async def loseProperty(IDs: GetChoice):
+    currentGame = loadCurrentGame(IDs.gameID)
+    currentGame.pollutionHitsPLayerToRightAll(False)
     currentGame.changeAction("ENDTURN")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
