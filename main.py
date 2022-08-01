@@ -21,11 +21,11 @@ externalData = copy.deepcopy(data.externalData)
 data.updateData(externalData)
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:8080/play",
+    "http://192.168.1.99.tiangolo.com",
+    "https://192.168.1.99.tiangolo.com",
+    "http://192.168.1.99",
+    "http://192.168.1.99:8080",
+    "http://192.168.1.99:8080/play",
 ]
 
 app.add_middleware(
@@ -95,8 +95,8 @@ class GetLoanChoice(BaseModel):
     amount: int
 
 
-tokens = {"1": "test@test.com", "11ed000242d24714b6a4149a0442987a": "test1@test.com"}
-authTokens = {"1": "test@test.com", "11ed000242d24714b6a4149a0442987a": "test1@test.com"}
+tokens = {"1": "test@test.com", "8f51ceba0e9e431ebb66aa152ed5a53d": "test1@test.com"}
+authTokens = {"1": "test@test.com", "8f51ceba0e9e431ebb66aa152ed5a53d": "test1@test.com"}
 websockets = {}
 professions = []
 temps = db["initialData"]
@@ -255,6 +255,7 @@ async def signup(request: LoginData):
         return 1
     return 2
 
+
 @app.post("/auth")
 async def auth(request: LoginData):
     time.sleep(1)
@@ -375,7 +376,8 @@ async def endTurn(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.nextTurn()
     currentGame.saveData()
-    return {"EVENT": "ENDTURN"}
+    playerData = getPlayerData.getPlayerData(tokens[IDs.ID])
+    return playerData
 
 
 @app.post("/pay-back-loan")

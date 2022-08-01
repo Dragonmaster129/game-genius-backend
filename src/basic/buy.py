@@ -21,7 +21,7 @@ def buy(card, data, playerAction, amount=1):
             if card["option"] == "PUT" or card["option"] == "CALL":
                 card["turns"] = 3
         elif type != "business" or card["name"] == "CARD1":
-            if type == "realestate":
+            if type == "realestate" or type == "land":
                 if data["cash"] < card["downpay"]:
                     loan = math.ceil((card["downpay"] - data["cash"])/1000)*1000
                     borrowLoan.borrowLoan(data, loan)

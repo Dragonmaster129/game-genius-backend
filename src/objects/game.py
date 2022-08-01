@@ -51,7 +51,7 @@ class Game:
             except IndexError:
                 break
         random.shuffle(List)
-        self.marketOrder = copy.deepcopy(List)
+        self.marketOrder = copy.deepcopy(List[0: 25])
         Capital = db["capitalgain"]
         tmpList = Capital.find({}, {"_id": 0, "ID": True})
         List = []
