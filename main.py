@@ -430,19 +430,9 @@ async def sellCard(IDs: GetSellChoice):
         currentGame.sellCard(IDs.sellItem, currentGame.currentCard["price"], currentGame.currentCard["size"])
     except KeyError:
         currentGame.sellCard(IDs.sellItem, currentGame.currentCard["card"]["costPerShare"], IDs.amount)
-    if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
-        currentGame.changeAction("MARKET")
-    else:
-        currentGame.changeAction("ENDTURN")
     currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData
-
-
-@app.post("/choice/Sell All")
-async def sellAllCards(IDs: GetChoice):
-    currentGame = loadCurrentGame(IDs.gameID)
-    sellItem = currentGame.findFirstValue(currentGame.currentCard["name"])
 
 
 @app.post("/choice/Short")

@@ -19,6 +19,8 @@ def sell(itemData, data, playerAction, price, amount=1):
         if itemData[1] == "stock":
             if amount == 0:
                 amount = exitingData["amount"]
+            if amount > exitingData["amount"]:
+                amount = exitingData["amount"]
             if exitingData["option"] == "regular":
                 data["cash"] += (price * amount)
                 exitingData["amount"] -= amount
