@@ -431,6 +431,10 @@ async def takeCard(IDs: GetChoice):
 @app.post("/choice/Sell")
 async def sellCard(IDs: GetSellChoice):
     currentGame = loadCurrentGame(IDs.gameID)
+    email = tokens[IDs.ID]
+    for i in range(len(currentGame.playerList)):
+        if currentGame.playerList[i].playerData["email"] == email:
+            currentGame.currentTarget = i
     try:
         currentGame.sellCard(IDs.sellItem, currentGame.currentCard["price"], currentGame.currentCard["size"])
     except KeyError:
@@ -466,9 +470,11 @@ async def OKCard(IDs: GetChoice):
             currentGame.recessionTradeImproves(currentGame.currentCard["amount"])
     except KeyError:
         pass
-    if currentGame.currentAction != "STARTTURN":
-        currentGame.changeAction("ENDTURN")
-    currentGame.saveData()
+    email = tokens[IDs.ID]
+    if email == currentGame.getEmailList()[currentGame.currentTarget]:
+        if currentGame.currentAction != "STARTTURN":
+            currentGame.changeAction("ENDTURN")
+        currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]
     return playerData
 
@@ -554,10 +560,13 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.post("/choice/{slug}")
 async def doNothing(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
-    if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
-        currentGame.changeAction("MARKET")
-    elif currentGame.currentAction == "STARTTURN":
-        pass
-    else:
-        currentGame.changeAction("ENDTURN")
+    email = tokens[IDs.ID]
+    if currentGame.currentCard != {}:
+        if email == currentGame.getEmailList()[currentGame.currentTarget]:
+            if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
+                currentGame.changeAction("MARKET")
+            elif currentGame.currentAction == "STARTTURN":
+                pass
+            else:
+                currentGame.changeAction("ENDTURN")
     return getPlayerData.getPlayerData(tokens[IDs.ID])["playerData"]

@@ -188,6 +188,10 @@ class Game:
                         optionsCard["name"] = self.currentCard["card"]["name"]
                         if self.currentCard["card"]["option"] == "regular":
                             optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
+                        elif self.currentCard["card"]["options"] == "call":
+                            optionsCard["options"] = ["Amount", "Buy", "Do nothing"]
+                        elif self.currentCard["card"]["options"] == "put":
+                            optionsCard["options"] = ["Amount", "Buy", "Do nothing"]
                 except KeyError:
                     print(self.currentCard)
             except KeyError:
@@ -226,6 +230,12 @@ class Game:
             if self.currentCard["target"] == "you":
                 self.currentTarget = copy.deepcopy(self.currentTurn)
                 self.sendMsgToCurrentTarget(optionsCard)
+                try:
+                    if self.currentCard["type"] == "stock":
+                        optionsCard["options"] = ["Sell", "Do nothing"]
+                except KeyError:
+                    if self.currentCard["card"]["type"] == "stock":
+                        optionsCard["options"] = ["Sell", "Do nothing"]
             elif self.currentCard["target"] == "right":
                 self.currentTarget = copy.deepcopy((self.currentTurn - 1) % len(self.playerList))
                 self.sendMsgToCurrentTarget(optionsCard)
@@ -283,6 +293,7 @@ class Game:
     def nextTurn(self):
         if self.checkCharity():
             self.charityTurnEnd()
+        self.currentCard = {}
         self.currentTurn = (self.currentTurn + 1) % len(self.playerList)
         self.currentTarget = copy.deepcopy(self.currentTurn)
         if downsized.decreaseDownsized(self.playerList[self.currentTurn].playerData["playerData"]):
