@@ -138,6 +138,11 @@ def loadCurrentGame(gameID):
     return currentGame
 
 
+@app.get("/")
+async def Init():
+    return "Base state"
+
+
 @app.get("/data/{tokenID}")
 async def getData(tokenID):
     if tokenID in tokens:
