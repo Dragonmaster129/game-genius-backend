@@ -1,2 +1,2 @@
-web: uvicorn --host 0.0.0.0 --port 443 main:app --reload
-worker: uvicorn --host 0.0.0.0 --port 443 main:app --reload
+web: gunicorn -w 3 -k uvicorn.workers.UvicornWorker main:app
+worker: gunicorn -w 3 -k uvicorn.workers.UvicornWorker main:app
