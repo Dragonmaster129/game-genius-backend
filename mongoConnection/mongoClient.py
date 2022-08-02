@@ -1,8 +1,9 @@
-from pymongo import MongoClient
-
+import pymongo
+import os
 
 def client(database):
-    mo_c = MongoClient()
+    mo_c = pymongo.MongoClient(
+        "mongodb+srv://" + os.environ["MONGO_USER"] + ":" + os.environ["MONGO_PASS"] + "@game-genius.6zd3s9u.mongodb.net/?retryWrites=true&w=majority")
 
     db = mo_c[database]
 
