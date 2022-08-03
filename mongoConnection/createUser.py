@@ -8,6 +8,7 @@ def createUser(email, pwd):
         "pwd": authentication.hashText(pwd),
         "gameID": 0,
         "createdDate": time.ctime(time.time()),
+        "auth": 0
     }
     db = mongoClient.client("cashflowDB")
     playerCol = db["player"]
