@@ -161,7 +161,6 @@ class Game:
 
     def sendPlayerTheirOptions(self):
         optionsCard = {"description": self.currentCard["description"], "title": self.currentCard["title"]}
-        print(self.currentCard)
         if self.currentAction != "DOODAD":
             try:
                 if self.currentCard["card"]["type"] == "realestate":
@@ -188,6 +187,7 @@ class Game:
                         optionsCard["name"] = self.currentCard["card"]["name"]
                         if self.currentCard["card"]["option"] == "regular":
                             optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
+                            self.checkForShortOptions(self.currentCard)
                         elif self.currentCard["card"]["options"] == "call":
                             optionsCard["options"] = ["Amount", "Buy", "Do nothing"]
                         elif self.currentCard["card"]["options"] == "put":
@@ -212,6 +212,7 @@ class Game:
                     optionsCard["type"] = "stock"
                     optionsCard["name"] = self.currentCard["name"]
                     optionsCard["options"] = ["Amount", "Buy", "Sell", "Short", "Do nothing"]
+                    self.checkForShortOptions(self.currentCard)
                 elif self.currentCard["type"] == "land":
                     optionsCard["type"] = "land"
                     optionsCard["name"] = "LAND"
@@ -244,14 +245,19 @@ class Game:
             elif self.currentCard["target"] == "all":
                 self.sendMsgToAllPlayers(optionsCard)
             elif self.currentCard["target"] == "playerToRightAll":
+                sent = 0
                 for i in range(len(self.playerList)):
                     if self.currentCard["type"] == "Pollution Found":
                         if pollution.checkPollution(self.playerList[self.currentTurn - i - 1].playerData["playerData"]):
                             if insurance.checkInsurance(self.playerList[self.currentTurn - i - 1].playerData["playerData"]):
                                 optionsCard["options"] = ["Insured"]
                             self.sendMsgToCurrentTarget(optionsCard)
+                            sent = 1
                             break
                         self.currentTarget = self.currentTurn - i - 1
+                if sent == 0:
+                    optionsCard["options"] = ["Found no players"]
+                    self.sendMsgToCurrentTarget(optionsCard)
         except KeyError:
             self.sendMsgToCurrentTarget(optionsCard)
 
@@ -268,6 +274,21 @@ class Game:
         optionsCard = {"description": "Lose two turns and pay your expenses", "title": "Your company downsized",
                        "options": ["OK"]}
         self.sendMsgToCurrentTarget(optionsCard)
+
+    def checkForShortOptions(self, card):
+        optionsCard = {"description": "Act on short", "title": "SHORT", "options": ["OK"]}
+        for i in range(len(self.playerList)):
+            for l in self.playerList[i].playerData["playerData"]["assets"]["stock"]:
+                try:
+                    if l["option"] == "SHORT" and l["name"] == card["name"]:
+                        self.currentTarget = i
+                        self.sendMsgToCurrentTarget(optionsCard)
+                        self.sellCard(["assets", "stock", l["key"]], card["price"], l['amount'])
+                except KeyError:
+                    if l["option"] == "SHORT" and l["name"] == card["card"]["name"]:
+                        self.currentTarget = i
+                        self.sendMsgToCurrentTarget(optionsCard)
+                        self.sellCard(["assets", "stock", l["key"]], card["card"]["costPerShare"], l['amount'])
 
     def saveData(self, collection=None):
         if collection is None:

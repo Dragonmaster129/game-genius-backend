@@ -315,8 +315,8 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CAPITALGAIN")
     currentGame.drawCard()
-    currentGame.saveData()
     currentGame.sendPlayerTheirOptions()
+    currentGame.saveData()
     return True
 
 
@@ -325,8 +325,8 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CASHFLOW")
     currentGame.drawCard()
-    currentGame.saveData()
     currentGame.sendPlayerTheirOptions()
+    currentGame.saveData()
     return True
 
 
@@ -335,8 +335,8 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("DOODAD")
     currentGame.drawCard()
-    currentGame.saveData()
     currentGame.sendPlayerTheirOptions()
+    currentGame.saveData()
     return True
 
 
@@ -345,8 +345,8 @@ async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("MARKET")
     currentGame.drawCard()
-    currentGame.saveData()
     currentGame.sendPlayerTheirOptions()
+    currentGame.saveData()
     return True
 
 
@@ -354,8 +354,8 @@ async def capitalGain(IDs: GetCard):
 async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("CHARITY")
-    currentGame.saveData()
     currentCard = currentGame.sendPlayerCharityOptions()
+    currentGame.saveData()
     return currentCard
 
 
@@ -363,8 +363,8 @@ async def capitalGain(IDs: GetCard):
 async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("BABY")
-    currentGame.saveData()
     currentCard = currentGame.sendPlayerBabyOptions()
+    currentGame.saveData()
     return currentCard
 
 
@@ -372,8 +372,8 @@ async def capitalGain(IDs: GetCard):
 async def capitalGain(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.changeAction("DOWNSIZED")
-    currentGame.saveData()
     currentCard = currentGame.sendPlayerDownsizedOptions()
+    currentGame.saveData()
     return currentCard
 
 
@@ -381,8 +381,8 @@ async def capitalGain(IDs: GetCard):
 async def endTurn(IDs: GetCard):
     currentGame = loadCurrentGame(IDs.gameID)
     currentGame.nextTurn()
-    currentGame.saveData()
     playerData = getPlayerData.getPlayerData(tokens[IDs.ID])
+    currentGame.saveData()
     return playerData
 
 
@@ -453,6 +453,12 @@ async def sellCard(IDs: GetSellChoice):
 @app.post("/choice/Short")
 async def shortCard(IDs: GetChoice):
     currentGame = loadCurrentGame(IDs.gameID)
+    try:
+        card = copy.deepcopy(currentGame.currentCard["card"])
+    except KeyError:
+        card = copy.deepcopy(currentGame.currentCard)
+    card["option"] = "SHORT"
+    currentGame.buyItem(card, IDs.amount)
     if currentGame.currentAction == "CAPITALGAIN" or currentGame.currentAction == "CASHFLOW":
         currentGame.changeAction("MARKET")
     else:
