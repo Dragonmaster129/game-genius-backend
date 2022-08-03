@@ -25,9 +25,8 @@ origins = [
     "https://192.168.1.99.tiangolo.com",
     "http://192.168.1.99",
     "http://192.168.1.99:8080",
-    "http://jcp-game-genius-frontend.herokuapp.com.tiangolo.com",
     "https://jcp-game-genius-frontend.herokuapp.com.tiangolo.com",
-    "https://jcp-game-genius-frontend.herokuapp.com/",
+    "https://jcp-game-genius-frontend.herokuapp.com",
 ]
 
 app.add_middleware(
